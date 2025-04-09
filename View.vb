@@ -1,11 +1,9 @@
 ﻿Imports System.Data.SQLite
 
-
 Public Class View
     Private listf1day As New List(Of FlowLayoutPanel)
     Private currentDate As DateTime = DateTime.Today
     Private notifyIcon As New NotifyIcon()
-
 
     Private Sub ConfigureNotifyIcon()
         notifyIcon.Icon = SystemIcons.Information
@@ -55,9 +53,8 @@ Public Class View
         Return firstdayofcurrentday.AddMonths(1).AddDays(-1).Day
     End Function
 
-
     Private Sub GenerateDayPanel(ByVal totalDays As Integer)
-        f1Days.Controls.Clear()
+        f1days.Controls.Clear()
         listf1day.Clear()
         For i As Integer = 1 To totalDays
             Dim f1 As New FlowLayoutPanel
@@ -67,7 +64,6 @@ Public Class View
             f1.BorderStyle = BorderStyle.FixedSingle
             f1.Cursor = Cursors.Hand
             f1.AutoScroll = True
-            AddHandler f1.Click, AddressOf Addtasktof1day
             f1days.Controls.Add(f1)
             listf1day.Add(f1)
         Next
@@ -99,6 +95,4 @@ Public Class View
     Private Sub btntoday_Click(sender As Object, e As EventArgs) Handles btntoday.Click
         Today()
     End Sub
-
-
 End Class

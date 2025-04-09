@@ -72,30 +72,10 @@ Public Class signup
             MessageBox.Show("Please login to continue")
             signin.Show()
             Me.Hide()
-        End If
-
-
     End Sub
 
-    Private Sub userbox_GotFocus(sender As Object, e As EventArgs) Handles userbox.GotFocus
-        If userbox.Text = "Username" Then
-            userbox.Text = ""
-            userbox.ForeColor = Color.Black
-        End If
-    End Sub
-
-    Private Sub userbox_LostFocus(sender As Object, e As EventArgs) Handles userbox.LostFocus
-        If userbox.Text = "" Then
-            userbox.Text = "Username"
-            userbox.ForeColor = Color.DarkGray
-        End If
-    End Sub
-
-    Private Sub passbox_GotFocus(sender As Object, e As EventArgs) Handles passbox.GotFocus
-        If passbox.Text = "Password" Then
-            passbox.Text = ""
-            passbox.ForeColor = Color.Black
-        End If
+    Private Sub showbtn_CheckedChanged(sender As Object, e As EventArgs) Handles showbtn.CheckedChanged
+        passbox.UseSystemPasswordChar = Not showbtn.Checked
     End Sub
 
     Private Sub passbox_LostFocus(sender As Object, e As EventArgs) Handles passbox.LostFocus
