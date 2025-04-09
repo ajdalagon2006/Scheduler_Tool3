@@ -64,6 +64,9 @@
     <Reference Include="FontAwesome.Sharp, Version=6.6.0.0, Culture=neutral, PublicKeyToken=d16d1e4e568ec10f, processorArchitecture=MSIL">
       <HintPath>packages\FontAwesome.Sharp.6.6.0\lib\net48\FontAwesome.Sharp.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -103,7 +106,20 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Task.Designer.vb">
+      <DependentUpon>Task.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Task.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="btncolor.vb" />
+    <Compile Include="calendar.Designer.vb">
+      <DependentUpon>calendar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="calendar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DbConnection.vb" />
     <Compile Include="forgot.Designer.vb">
       <DependentUpon>forgot.vb</DependentUpon>
     </Compile>
@@ -116,6 +132,7 @@
     <Compile Include="Home.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="MonthlyCalendarInfo.vb" />
     <Compile Include="signin.Designer.vb">
       <DependentUpon>signin.vb</DependentUpon>
     </Compile>
@@ -151,12 +168,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="task.Designer.vb">
-      <DependentUpon>task.vb</DependentUpon>
-    </Compile>
-    <Compile Include="task.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="View.Designer.vb">
       <DependentUpon>View.vb</DependentUpon>
     </Compile>
@@ -165,6 +176,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Task.resx">
+      <DependentUpon>Task.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="calendar.resx">
+      <DependentUpon>calendar.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="forgot.resx">
       <DependentUpon>forgot.vb</DependentUpon>
     </EmbeddedResource>
@@ -185,9 +202,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Splash.resx">
       <DependentUpon>Splash.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="task.resx">
-      <DependentUpon>task.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View.resx">
       <DependentUpon>View.vb</DependentUpon>

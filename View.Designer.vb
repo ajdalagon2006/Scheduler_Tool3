@@ -42,6 +42,8 @@ Partial Class View
         Me.Label9 = New System.Windows.Forms.Label()
         Me.link = New System.Windows.Forms.LinkLabel()
         Me.ShowToastNotification = New System.Windows.Forms.NotifyIcon(Me.components)
+        Me.Link2 = New System.Windows.Forms.LinkLabel()
+        Me.Link3 = New System.Windows.Forms.LinkLabel()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
@@ -208,6 +210,8 @@ Partial Class View
         Me.f1.BackColor = System.Drawing.Color.FromArgb(CType(CType(237, Byte), Integer), CType(CType(233, Byte), Integer), CType(CType(208, Byte), Integer))
         Me.f1.Controls.Add(Me.Label9)
         Me.f1.Controls.Add(Me.link)
+        Me.f1.Controls.Add(Me.Link2)
+        Me.f1.Controls.Add(Me.Link3)
         Me.f1.Location = New System.Drawing.Point(3, 3)
         Me.f1.Name = "f1"
         Me.f1.Size = New System.Drawing.Size(123, 95)
@@ -240,6 +244,26 @@ Partial Class View
         Me.ShowToastNotification.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info
         Me.ShowToastNotification.Text = "NotifyIcon1"
         Me.ShowToastNotification.Visible = True
+        '
+        'Link2
+        '
+        Me.Link2.AutoSize = True
+        Me.Link2.Location = New System.Drawing.Point(3, 36)
+        Me.Link2.Name = "Link2"
+        Me.Link2.Size = New System.Drawing.Size(59, 13)
+        Me.Link2.TabIndex = 2
+        Me.Link2.TabStop = True
+        Me.Link2.Text = "LinkLabel1"
+        '
+        'Link3
+        '
+        Me.Link3.AutoSize = True
+        Me.Link3.Location = New System.Drawing.Point(3, 49)
+        Me.Link3.Name = "Link3"
+        Me.Link3.Size = New System.Drawing.Size(59, 13)
+        Me.Link3.TabIndex = 3
+        Me.Link3.TabStop = True
+        Me.Link3.Text = "LinkLabel1"
         '
         'View
         '
@@ -283,4 +307,6 @@ Partial Class View
     Friend WithEvents Label9 As Label
     Friend WithEvents link As LinkLabel
     Friend WithEvents ShowToastNotification As NotifyIcon
+    Friend WithEvents Link2 As LinkLabel
+    Friend WithEvents Link3 As LinkLabel
 End Class

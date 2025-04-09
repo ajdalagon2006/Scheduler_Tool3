@@ -1,11 +1,10 @@
 ﻿Imports System.Data.SQLite
-
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
 
 Public Class View
     Private listf1day As New List(Of FlowLayoutPanel)
     Private currentDate As DateTime = DateTime.Today
     Private notifyIcon As New NotifyIcon()
-
 
     Private Sub ConfigureNotifyIcon()
         notifyIcon.Icon = SystemIcons.Information
@@ -20,11 +19,37 @@ Public Class View
 
     Private Sub Addtasktof1day()
         Dim startDate As DateTime = New Date(currentDate.Year, currentDate.Month, 1)
-        Dim Enddate As DateTime = startDate.AddMonths(1).AddDays(-1)
-        Dim connectionString As String = "Data Source=Appdata.db;Version=3;"
-        Dim sql As String = $"select * From Database where date between '{startDate:yyyy-MM-dd}' and '{Enddate:yyyy-MM-dd}'"
-        Dim dt As New DataTable
-
+        Dim endDate As DateTime = startDate.AddMonths(1).AddDays(-1)
+        Dim conn As New SQLiteConnection("Data Source=|DataDirectory|\Appdatabase.db;Version=3;")
+        Try
+            conn.Open()
+            Dim cmd As New SQLiteCommand("SELECT * FROM Task WHERE Date BETWEEN @startDate AND @endDate", conn)
+            cmd.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"))
+            cmd.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"))
+            Dim reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read()
+                Dim taskDate As DateTime
+                If DateTime.TryParse(reader("Date").ToString(), taskDate) Then
+                    Dim link As New LinkLabel()
+                    link.Tag = reader("ID")
+                    link.Name = $"link{reader("ID")}"
+                    link.Text = reader("todoname").ToString()
+                    listf1day(taskDate.Day + (GetFirstDayOfWeekOfCurrentdate() - 1)).Controls.Add(link)
+                    If taskDate.Date = DateTime.Today Then
+                        notifyIcon.BalloonTipTitle = "Task Due Today"
+                        notifyIcon.BalloonTipText = $"Task: {reader("todoname")}"
+                        notifyIcon.ShowBalloonTip(3000)
+                    End If
+                Else
+                    MessageBox.Show("Error parsing task date: " & reader("Date").ToString())
+                End If
+            End While
+            reader.Close()
+        Catch ex As Exception
+            MessageBox.Show("Error retrieving tasks: " & ex.Message)
+        Finally
+            conn.Close()
+        End Try
     End Sub
 
     Private Sub DisplayCurrentDate()
@@ -55,9 +80,8 @@ Public Class View
         Return firstdayofcurrentday.AddMonths(1).AddDays(-1).Day
     End Function
 
-
     Private Sub GenerateDayPanel(ByVal totalDays As Integer)
-        f1Days.Controls.Clear()
+        f1days.Controls.Clear()
         listf1day.Clear()
         For i As Integer = 1 To totalDays
             Dim f1 As New FlowLayoutPanel
@@ -67,7 +91,6 @@ Public Class View
             f1.BorderStyle = BorderStyle.FixedSingle
             f1.Cursor = Cursors.Hand
             f1.AutoScroll = True
-            AddHandler f1.Click, AddressOf Addtasktof1day
             f1days.Controls.Add(f1)
             listf1day.Add(f1)
         Next
@@ -92,6 +115,7 @@ Public Class View
             listf1day(i - 1 + startDayAtf1Number - 1).Controls.Add(lbl)
         Next
     End Sub
+
     Private Sub nextbtn_Click(sender As Object, e As EventArgs) Handles nextbtn.Click
         Nextmonth()
     End Sub
@@ -99,6 +123,4 @@ Public Class View
     Private Sub btntoday_Click(sender As Object, e As EventArgs) Handles btntoday.Click
         Today()
     End Sub
-
-
 End Class

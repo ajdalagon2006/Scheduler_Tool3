@@ -3,18 +3,46 @@ Imports Microsoft.VisualBasic.ApplicationServices
 Imports System.Data.SQLite
 
 Public Class Home
+    Private userId As Integer
+
+    ' Constructor accepting user ID
+    Public Sub New(userId As Integer)
+        ' This call is required by the designer.
+        InitializeComponent()
+        ' Add any initialization after the InitializeComponent() call.
+        Me.userId = userId
+        topBorderBtn = New Panel()
+        topBorderBtn.Size = New Size(7, 60)
+        Panelmenu.Controls.Add(topBorderBtn)
+    End Sub
+
     Private Sub Home0_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        topBorderBtn = New Panel()
+        topBorderBtn.Size = New Size(7, 60)
+        Panelmenu.Controls.Add(topBorderBtn)
+
         Dim username As String = GetUsername()
         SetUsername(username)
         Me.AutoScroll = True
     End Sub
 
+
+    Public Sub SetUsername(user As String)
+        username = user
+        If String.IsNullOrEmpty(username) Then
+            lbluser.Text = "Welcome User!"
+        Else
+            lbluser.Text = $"Welcome Back {username}!"
+        End If
+    End Sub
+
     Private Function GetUsername() As String
-        Dim Username As String = String.Empty
+        Dim username As String = String.Empty
         Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         Try
             conn.Open()
-            Dim cmd As New SQLiteCommand("SELECT Username FROM Userdatabase WHERE ID = 1", conn)
+            Dim cmd As New SQLiteCommand("SELECT Username FROM Userdatabase WHERE ID = @id", conn)
+            cmd.Parameters.AddWithValue("@id", userId)
             Dim reader As SQLiteDataReader = cmd.ExecuteReader()
             If reader.Read() Then
                 username = reader("Username").ToString()
@@ -32,16 +60,6 @@ Public Class Home
     Private currentBtn As IconButton
     Private topBorderBtn As Panel
     Private currentChildForm As Form
-
-    'Constructor
-    Public Sub New()
-        ' This call is required by the designer.
-        InitializeComponent()
-        ' Add any initialization after the InitializeComponent() call.
-        topBorderBtn = New Panel()
-        topBorderBtn.Size = New Size(7, 60)
-        Panelmenu.Controls.Add(topBorderBtn)
-    End Sub
 
     'Methods
     Private Sub ActivateButton(senderBtn As Object, customcolor As Color)
@@ -96,15 +114,6 @@ Public Class Home
     End Sub
     Private username As String
 
-    Public Sub SetUsername(user As String)
-        username = user
-        If String.IsNullOrEmpty(username) Then
-            lbluser.Text = "Welcome User!"
-        Else
-            lbluser.Text = $"Welcome {username}!"
-        End If
-    End Sub
-
     Private Sub Home_Click(sender As Object, e As EventArgs) Handles homebtn.Click
         If currentChildForm IsNot Nothing Then
             currentChildForm.Close()
@@ -117,16 +126,16 @@ Public Class Home
         topBorderBtn.Visible = False
         homecurrenticon.IconChar = IconChar.HomeUser
         lblFormTitle.Text = "Home"
-
     End Sub
+
     Private Sub viewbtn_Click(sender As Object, e As EventArgs) Handles viewbtn.Click
         ActivateButton(sender, btncolor.color1)
-        OpenChildForm(New View)
+        OpenChildForm(New calendar)
         lblFormTitle.Text = "Calendar View"
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        task.Show()
+        Dim addEditForm As New Task(DateTime.Now) ' Pass the current date or any specific date
+        addEditForm.Show()
     End Sub
-
 End Class

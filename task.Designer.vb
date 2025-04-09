@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class task
+Partial Class Task
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -22,67 +22,30 @@ Partial Class task
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.todobox = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.comsecbox = New System.Windows.Forms.TextBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.date1 = New System.Windows.Forms.DateTimePicker()
         Me.IconPictureBox1 = New FontAwesome.Sharp.IconPictureBox()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.e1 = New System.Windows.Forms.RadioButton()
-        Me.s1 = New System.Windows.Forms.RadioButton()
-        Me.createbtn = New System.Windows.Forms.Button()
+        Me.comsecbox = New System.Windows.Forms.TextBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.todobox = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
         Me.Cancelbtn = New System.Windows.Forms.Button()
+        Me.createbtn = New System.Windows.Forms.Button()
+        Me.s1 = New System.Windows.Forms.RadioButton()
+        Me.e1 = New System.Windows.Forms.RadioButton()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.Panel1.SuspendLayout()
         CType(Me.IconPictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
-        Me.Label1.Location = New System.Drawing.Point(12, 72)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(58, 22)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "To do"
-        '
-        'todobox
-        '
-        Me.todobox.Location = New System.Drawing.Point(68, 72)
-        Me.todobox.Name = "todobox"
-        Me.todobox.Size = New System.Drawing.Size(324, 20)
-        Me.todobox.TabIndex = 1
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
-        Me.Label2.Location = New System.Drawing.Point(12, 109)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(90, 22)
-        Me.Label2.TabIndex = 2
-        Me.Label2.Text = "Comment"
-        '
-        'comsecbox
-        '
-        Me.comsecbox.Location = New System.Drawing.Point(108, 109)
-        Me.comsecbox.Multiline = True
-        Me.comsecbox.Name = "comsecbox"
-        Me.comsecbox.Size = New System.Drawing.Size(284, 78)
-        Me.comsecbox.TabIndex = 3
         '
         'Panel1
         '
         Me.Panel1.Controls.Add(Me.date1)
         Me.Panel1.Controls.Add(Me.IconPictureBox1)
-        Me.Panel1.Location = New System.Drawing.Point(16, 193)
+        Me.Panel1.Location = New System.Drawing.Point(16, 171)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(335, 48)
-        Me.Panel1.TabIndex = 4
+        Me.Panel1.TabIndex = 14
         '
         'date1
         '
@@ -106,81 +69,118 @@ Partial Class task
         Me.IconPictureBox1.TabIndex = 0
         Me.IconPictureBox1.TabStop = False
         '
-        'Label3
+        'comsecbox
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
-        Me.Label3.Location = New System.Drawing.Point(12, 259)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(144, 22)
-        Me.Label3.TabIndex = 5
-        Me.Label3.Text = "Select Catergory"
+        Me.comsecbox.Location = New System.Drawing.Point(108, 87)
+        Me.comsecbox.Multiline = True
+        Me.comsecbox.Name = "comsecbox"
+        Me.comsecbox.Size = New System.Drawing.Size(284, 78)
+        Me.comsecbox.TabIndex = 13
         '
-        'e1
+        'Label2
         '
-        Me.e1.AutoSize = True
-        Me.e1.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.e1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(226, Byte), Integer), CType(CType(234, Byte), Integer), CType(CType(247, Byte), Integer))
-        Me.e1.Location = New System.Drawing.Point(162, 257)
-        Me.e1.Name = "e1"
-        Me.e1.Size = New System.Drawing.Size(72, 26)
-        Me.e1.TabIndex = 6
-        Me.e1.TabStop = True
-        Me.e1.Text = "Event"
-        Me.e1.UseVisualStyleBackColor = True
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
+        Me.Label2.Location = New System.Drawing.Point(12, 87)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(90, 22)
+        Me.Label2.TabIndex = 12
+        Me.Label2.Text = "Comment"
+        '
+        'todobox
+        '
+        Me.todobox.Location = New System.Drawing.Point(72, 50)
+        Me.todobox.Name = "todobox"
+        Me.todobox.Size = New System.Drawing.Size(324, 20)
+        Me.todobox.TabIndex = 11
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
+        Me.Label1.Location = New System.Drawing.Point(12, 50)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(58, 22)
+        Me.Label1.TabIndex = 10
+        Me.Label1.Text = "To do"
+        '
+        'Cancelbtn
+        '
+        Me.Cancelbtn.Location = New System.Drawing.Point(91, 365)
+        Me.Cancelbtn.Name = "Cancelbtn"
+        Me.Cancelbtn.Size = New System.Drawing.Size(222, 35)
+        Me.Cancelbtn.TabIndex = 19
+        Me.Cancelbtn.Text = "Cancel"
+        Me.Cancelbtn.UseVisualStyleBackColor = True
+        '
+        'createbtn
+        '
+        Me.createbtn.Location = New System.Drawing.Point(91, 324)
+        Me.createbtn.Name = "createbtn"
+        Me.createbtn.Size = New System.Drawing.Size(222, 35)
+        Me.createbtn.TabIndex = 18
+        Me.createbtn.Text = "Create"
+        Me.createbtn.UseVisualStyleBackColor = True
         '
         's1
         '
         Me.s1.AutoSize = True
         Me.s1.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.s1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(226, Byte), Integer), CType(CType(234, Byte), Integer), CType(CType(247, Byte), Integer))
-        Me.s1.Location = New System.Drawing.Point(240, 257)
+        Me.s1.Location = New System.Drawing.Point(240, 235)
         Me.s1.Name = "s1"
         Me.s1.Size = New System.Drawing.Size(141, 26)
-        Me.s1.TabIndex = 7
+        Me.s1.TabIndex = 17
         Me.s1.TabStop = True
         Me.s1.Text = "School Works"
         Me.s1.UseVisualStyleBackColor = True
         '
-        'createbtn
+        'e1
         '
-        Me.createbtn.Location = New System.Drawing.Point(91, 346)
-        Me.createbtn.Name = "createbtn"
-        Me.createbtn.Size = New System.Drawing.Size(222, 35)
-        Me.createbtn.TabIndex = 8
-        Me.createbtn.Text = "Create"
-        Me.createbtn.UseVisualStyleBackColor = True
+        Me.e1.AutoSize = True
+        Me.e1.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.e1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(226, Byte), Integer), CType(CType(234, Byte), Integer), CType(CType(247, Byte), Integer))
+        Me.e1.Location = New System.Drawing.Point(162, 235)
+        Me.e1.Name = "e1"
+        Me.e1.Size = New System.Drawing.Size(72, 26)
+        Me.e1.TabIndex = 16
+        Me.e1.TabStop = True
+        Me.e1.Text = "Event"
+        Me.e1.UseVisualStyleBackColor = True
         '
-        'Cancelbtn
+        'Label3
         '
-        Me.Cancelbtn.Location = New System.Drawing.Point(91, 387)
-        Me.Cancelbtn.Name = "Cancelbtn"
-        Me.Cancelbtn.Size = New System.Drawing.Size(222, 35)
-        Me.Cancelbtn.TabIndex = 9
-        Me.Cancelbtn.Text = "Cancel"
-        Me.Cancelbtn.UseVisualStyleBackColor = True
+        Me.Label3.AutoSize = True
+        Me.Label3.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
+        Me.Label3.Location = New System.Drawing.Point(12, 237)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(144, 22)
+        Me.Label3.TabIndex = 15
+        Me.Label3.Text = "Select Catergory"
         '
-        'task
+        'AddEditCalendarEntry
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(54, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(404, 450)
-        Me.Controls.Add(Me.Cancelbtn)
-        Me.Controls.Add(Me.createbtn)
-        Me.Controls.Add(Me.s1)
-        Me.Controls.Add(Me.e1)
-        Me.Controls.Add(Me.Label3)
+        Me.ControlBox = False
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.comsecbox)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.todobox)
         Me.Controls.Add(Me.Label1)
-        Me.MaximizeBox = False
-        Me.Name = "task"
+        Me.Controls.Add(Me.Cancelbtn)
+        Me.Controls.Add(Me.createbtn)
+        Me.Controls.Add(Me.s1)
+        Me.Controls.Add(Me.e1)
+        Me.Controls.Add(Me.Label3)
+        Me.Name = "AddEditCalendarEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "task"
+        Me.Text = "ADD"
         Me.Panel1.ResumeLayout(False)
         CType(Me.IconPictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -188,16 +188,16 @@ Partial Class task
 
     End Sub
 
-    Friend WithEvents Label1 As Label
-    Friend WithEvents todobox As TextBox
-    Friend WithEvents Label2 As Label
-    Friend WithEvents comsecbox As TextBox
     Friend WithEvents Panel1 As Panel
-    Friend WithEvents IconPictureBox1 As FontAwesome.Sharp.IconPictureBox
     Friend WithEvents date1 As DateTimePicker
-    Friend WithEvents Label3 As Label
-    Friend WithEvents e1 As RadioButton
-    Friend WithEvents s1 As RadioButton
-    Friend WithEvents createbtn As Button
+    Friend WithEvents IconPictureBox1 As FontAwesome.Sharp.IconPictureBox
+    Friend WithEvents comsecbox As TextBox
+    Friend WithEvents Label2 As Label
+    Friend WithEvents todobox As TextBox
+    Friend WithEvents Label1 As Label
     Friend WithEvents Cancelbtn As Button
+    Friend WithEvents createbtn As Button
+    Friend WithEvents s1 As RadioButton
+    Friend WithEvents e1 As RadioButton
+    Friend WithEvents Label3 As Label
 End Class
