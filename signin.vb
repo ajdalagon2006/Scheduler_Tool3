@@ -2,7 +2,7 @@
 
 Public Class signin
     Private Sub signin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim conn As New SQLiteConnection("Data Source=|DataDirectory|\Appdatabase.db;Version=3;")
+        Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         conn.Open()
 
         Dim checkCmd As New SQLiteCommand("SELECT COUNT(*) FROM Userdatabase", conn)
@@ -32,7 +32,7 @@ Public Class signin
             Return
         End If
 
-        Dim conn As New SQLiteConnection("Data Source=|DataDirectory|\Appdatabase.db;Version=3;")
+        Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         Try
             conn.Open()
             Dim cmd As New SQLiteCommand("SELECT ID, Username FROM Userdatabase WHERE Username = @username AND Password = @password", conn)
@@ -43,7 +43,7 @@ Public Class signin
             If reader.Read() Then
                 MessageBox.Show("Login successful")
 
-                ' Ensure ID is not Nothing
+
                 Dim userId As Integer = If(reader("ID") IsNot DBNull.Value, Convert.ToInt32(reader("ID")), 0)
 
                 ' Only update LoggedIn if we got a valid ID
@@ -53,9 +53,7 @@ Public Class signin
                     updateCmd.ExecuteNonQuery()
                 End If
 
-                reader.Close()  ' Close the reader before using data
-
-                ' Ensure the Home form constructor expects an ID and username
+                reader.Close()
                 Dim homeForm As New Home(userId)
                 homeForm.SetUsername(userbox.Text)
                 homeForm.Show()

@@ -34,8 +34,15 @@ Partial Class Task
         Me.s1 = New System.Windows.Forms.RadioButton()
         Me.e1 = New System.Windows.Forms.RadioButton()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.chkAlarm = New System.Windows.Forms.CheckBox()
+        Me.grpAlarm = New System.Windows.Forms.GroupBox()
+        Me.lblCustomSound = New System.Windows.Forms.Label()
+        Me.btnBrowseSound = New System.Windows.Forms.Button()
+        Me.txtSoundFile = New System.Windows.Forms.TextBox()
+        Me.timePicker = New System.Windows.Forms.DateTimePicker()
         Me.Panel1.SuspendLayout()
         CType(Me.IconPictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.grpAlarm.SuspendLayout()
         Me.SuspendLayout()
         '
         'Panel1
@@ -108,7 +115,7 @@ Partial Class Task
         '
         'Cancelbtn
         '
-        Me.Cancelbtn.Location = New System.Drawing.Point(91, 365)
+        Me.Cancelbtn.Location = New System.Drawing.Point(91, 485)
         Me.Cancelbtn.Name = "Cancelbtn"
         Me.Cancelbtn.Size = New System.Drawing.Size(222, 35)
         Me.Cancelbtn.TabIndex = 19
@@ -117,7 +124,7 @@ Partial Class Task
         '
         'createbtn
         '
-        Me.createbtn.Location = New System.Drawing.Point(91, 324)
+        Me.createbtn.Location = New System.Drawing.Point(91, 444)
         Me.createbtn.Name = "createbtn"
         Me.createbtn.Size = New System.Drawing.Size(222, 35)
         Me.createbtn.TabIndex = 18
@@ -161,13 +168,80 @@ Partial Class Task
         Me.Label3.TabIndex = 15
         Me.Label3.Text = "Select Catergory"
         '
-        'AddEditCalendarEntry
+        'chkAlarm
+        '
+        Me.chkAlarm.AutoSize = True
+        Me.chkAlarm.Font = New System.Drawing.Font("Microsoft YaHei UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.chkAlarm.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
+        Me.chkAlarm.Location = New System.Drawing.Point(16, 271)
+        Me.chkAlarm.Name = "chkAlarm"
+        Me.chkAlarm.Size = New System.Drawing.Size(129, 26)
+        Me.chkAlarm.TabIndex = 20
+        Me.chkAlarm.Text = "Set an Alarm"
+        Me.chkAlarm.UseVisualStyleBackColor = True
+        '
+        'grpAlarm
+        '
+        Me.grpAlarm.Controls.Add(Me.lblCustomSound)
+        Me.grpAlarm.Controls.Add(Me.btnBrowseSound)
+        Me.grpAlarm.Controls.Add(Me.txtSoundFile)
+        Me.grpAlarm.Controls.Add(Me.timePicker)
+        Me.grpAlarm.Font = New System.Drawing.Font("Microsoft YaHei UI", 10.0!, System.Drawing.FontStyle.Bold)
+        Me.grpAlarm.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
+        Me.grpAlarm.Location = New System.Drawing.Point(16, 303)
+        Me.grpAlarm.Name = "grpAlarm"
+        Me.grpAlarm.Size = New System.Drawing.Size(380, 130)
+        Me.grpAlarm.TabIndex = 21
+        Me.grpAlarm.TabStop = False
+        Me.grpAlarm.Text = "Alarm Settings"
+        '
+        'lblCustomSound
+        '
+        Me.lblCustomSound.AutoSize = True
+        Me.lblCustomSound.Location = New System.Drawing.Point(6, 64)
+        Me.lblCustomSound.Name = "lblCustomSound"
+        Me.lblCustomSound.Size = New System.Drawing.Size(112, 19)
+        Me.lblCustomSound.TabIndex = 3
+        Me.lblCustomSound.Text = "Custom Sound:"
+        '
+        'btnBrowseSound
+        '
+        Me.btnBrowseSound.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.btnBrowseSound.ForeColor = System.Drawing.Color.Black
+        Me.btnBrowseSound.Location = New System.Drawing.Point(299, 86)
+        Me.btnBrowseSound.Name = "btnBrowseSound"
+        Me.btnBrowseSound.Size = New System.Drawing.Size(75, 23)
+        Me.btnBrowseSound.TabIndex = 2
+        Me.btnBrowseSound.Text = "Browse..."
+        Me.btnBrowseSound.UseVisualStyleBackColor = True
+        '
+        'txtSoundFile
+        '
+        Me.txtSoundFile.Location = New System.Drawing.Point(10, 86)
+        Me.txtSoundFile.Name = "txtSoundFile"
+        Me.txtSoundFile.Size = New System.Drawing.Size(283, 25)
+        Me.txtSoundFile.TabIndex = 1
+        Me.txtSoundFile.Text = "default.wav"
+        '
+        'timePicker
+        '
+        Me.timePicker.CustomFormat = "hh:mm tt"
+        Me.timePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.timePicker.Location = New System.Drawing.Point(10, 24)
+        Me.timePicker.Name = "timePicker"
+        Me.timePicker.ShowUpDown = True
+        Me.timePicker.Size = New System.Drawing.Size(120, 25)
+        Me.timePicker.TabIndex = 0
+        '
+        'Task
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(54, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(66, Byte), Integer))
-        Me.ClientSize = New System.Drawing.Size(404, 450)
+        Me.ClientSize = New System.Drawing.Size(404, 540)
         Me.ControlBox = False
+        Me.Controls.Add(Me.grpAlarm)
+        Me.Controls.Add(Me.chkAlarm)
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.comsecbox)
         Me.Controls.Add(Me.Label2)
@@ -178,11 +252,13 @@ Partial Class Task
         Me.Controls.Add(Me.s1)
         Me.Controls.Add(Me.e1)
         Me.Controls.Add(Me.Label3)
-        Me.Name = "AddEditCalendarEntry"
+        Me.Name = "Task"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "ADD"
         Me.Panel1.ResumeLayout(False)
         CType(Me.IconPictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.grpAlarm.ResumeLayout(False)
+        Me.grpAlarm.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -200,4 +276,10 @@ Partial Class Task
     Friend WithEvents s1 As RadioButton
     Friend WithEvents e1 As RadioButton
     Friend WithEvents Label3 As Label
+    Friend WithEvents chkAlarm As CheckBox
+    Friend WithEvents grpAlarm As GroupBox
+    Friend WithEvents lblCustomSound As Label
+    Friend WithEvents btnBrowseSound As Button
+    Friend WithEvents txtSoundFile As TextBox
+    Friend WithEvents timePicker As DateTimePicker
 End Class

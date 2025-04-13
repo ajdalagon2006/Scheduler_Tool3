@@ -2,6 +2,6 @@
 
 Module DbConnection
     Public Function GetConnection() As SQLiteConnection
-        Return New SQLiteConnection("Data Source=|DataDirectory|\Appdatabase.db;Version=3;")
+        Return New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
     End Function
 End Module

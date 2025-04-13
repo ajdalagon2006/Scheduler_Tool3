@@ -106,6 +106,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlarmManager.vb" />
+    <Compile Include="AlarmNotification.Designer.vb">
+      <DependentUpon>AlarmNotification.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AlarmNotification.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HolidayManager.vb" />
     <Compile Include="Task.Designer.vb">
       <DependentUpon>Task.vb</DependentUpon>
     </Compile>

@@ -2,7 +2,7 @@
 
 Public Class signup
     Private Sub signup_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim conn As New SQLiteConnection("Data Source=|DataDirectory|\Appdatabase.db;Version=3;")
+        Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         conn.Open()
 
         Dim checkCmd As New SQLiteCommand("SELECT COUNT(*) FROM Userdatabase", conn)
@@ -18,7 +18,7 @@ Public Class signup
     End Sub
 
     Private Sub upbtn_Click(sender As Object, e As EventArgs) Handles upbtn.Click
-        Dim conn As New SQLiteConnection("Data Source=|DataDirectory|\Appdatabase.db;Version=3;")
+        Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         conn.Open()
         If userbox.Text = "" Or passbox.Text = "" Or (m1.Checked = False And f1.Checked = False) Then
             MessageBox.Show("Please fill all fields.")
@@ -33,12 +33,20 @@ Public Class signup
             MessageBox.Show("Password must be 9-20 characters.")
             Return
         End If
-        Dim genderVal As String = If(m1.Checked, "Male", "Female")
+
         Dim cmd As New SQLiteCommand("INSERT INTO Userdatabase (Username, Password, Birthday, Gender, LoggedIn) VALUES (@Username, @Password, @Birthday, @Gender, 0)", conn)
         cmd.Parameters.AddWithValue("@Username", userbox.Text)
         cmd.Parameters.AddWithValue("@Password", passbox.Text)
         cmd.Parameters.AddWithValue("@Birthday", bday.Value)
-        cmd.Parameters.AddWithValue("@Gender", genderVal)
+        Dim gender_v As Boolean
+        If m1.Checked = True Then
+            gender_v = 1 'Male
+        End If
+
+        If f1.Checked = True Then
+            gender_v = 0 'Female
+        End If
+        cmd.Parameters.AddWithValue("Gender", gender_v)
         cmd.ExecuteNonQuery()
         conn.Close()
 
