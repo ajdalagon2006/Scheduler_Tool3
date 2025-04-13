@@ -1,57 +1,82 @@
 ﻿Imports System.Data.SQLite
 Imports System.IO
 
+''' <summary>
+''' Database connection and schema management module
+''' </summary>
 Public Module DbConnection
-    ' Central connection method for all classes to use
-    Public Function GetSQLiteConnection() As SQLiteConnection
+    ''' <summary>
+    ''' Gets an open connection to the SQLite database (primary method)
+    ''' </summary>
+    Public Function GetConnection() As SQLiteConnection
         Dim connectionString As String = "Data Source=Appdatabase.db;Version=3;"
         Dim connection As New SQLiteConnection(connectionString)
         connection.Open()
         Return connection
     End Function
 
-    ' Update database schema to include alarm fields without losing data
+    ''' <summary>
+    ''' Gets an open connection to the SQLite database (alias for compatibility)
+    ''' </summary>
+    Public Function GetSQLiteConnection() As SQLiteConnection
+        Return GetConnection()
+    End Function
+
+    ''' <summary>
+    ''' Updates the database schema to include alarm-related columns
+    ''' </summary>
     Public Sub UpdateDatabaseSchema()
         Try
-            Using connection As SQLiteConnection = GetSQLiteConnection()
-                ' Check if we need to add columns to the Task table
-                Dim checkColumnsCmd As New SQLiteCommand(
-                    "PRAGMA table_info(Task)", connection)
+            Using connection As SQLiteConnection = GetConnection()
+                ' Check if alarm columns exist in Task table
+                Dim cmd As New SQLiteCommand("PRAGMA table_info(Task)", connection)
+                Dim reader As SQLiteDataReader = cmd.ExecuteReader()
 
-                Dim hasAlarmColumn As Boolean = False
-                Dim hasAlarmTimeColumn As Boolean = False
-                Dim hasAlarmSoundColumn As Boolean = False
+                Dim hasAlarmCol As Boolean = False
+                Dim hasAlarmTimeCol As Boolean = False
+                Dim hasAlarmSoundCol As Boolean = False
 
-                Using reader As SQLiteDataReader = checkColumnsCmd.ExecuteReader()
-                    While reader.Read()
-                        Dim columnName As String = reader("name").ToString()
-                        If columnName = "has_alarm" Then hasAlarmColumn = True
-                        If columnName = "alarm_time" Then hasAlarmTimeColumn = True
-                        If columnName = "alarm_sound" Then hasAlarmSoundColumn = True
-                    End While
-                End Using
+                While reader.Read()
+                    Dim colName As String = reader("name").ToString().ToLower()
+                    If colName = "has_alarm" Then hasAlarmCol = True
+                    If colName = "alarm_time" Then hasAlarmTimeCol = True
+                    If colName = "alarm_sound" Then hasAlarmSoundCol = True
+                End While
+                reader.Close()
 
-                ' Add columns if they don't exist
-                If Not hasAlarmColumn Then
-                    Dim alterTableCmd As New SQLiteCommand(
-                        "ALTER TABLE Task ADD COLUMN has_alarm INTEGER DEFAULT 0", connection)
-                    alterTableCmd.ExecuteNonQuery()
+                ' Add missing columns
+                If Not hasAlarmCol Then
+                    Dim alterCmd As New SQLiteCommand("ALTER TABLE Task ADD COLUMN has_alarm INTEGER DEFAULT 0", connection)
+                    alterCmd.ExecuteNonQuery()
+                    Console.WriteLine("Added has_alarm column to Task table")
                 End If
 
-                If Not hasAlarmTimeColumn Then
-                    Dim alterTableCmd As New SQLiteCommand(
-                        "ALTER TABLE Task ADD COLUMN alarm_time TEXT", connection)
-                    alterTableCmd.ExecuteNonQuery()
+                If Not hasAlarmTimeCol Then
+                    Dim alterCmd As New SQLiteCommand("ALTER TABLE Task ADD COLUMN alarm_time TEXT", connection)
+                    alterCmd.ExecuteNonQuery()
+                    Console.WriteLine("Added alarm_time column to Task table")
                 End If
 
-                If Not hasAlarmSoundColumn Then
-                    Dim alterTableCmd As New SQLiteCommand(
-                        "ALTER TABLE Task ADD COLUMN alarm_sound TEXT DEFAULT 'default.wav'", connection)
-                    alterTableCmd.ExecuteNonQuery()
+                If Not hasAlarmSoundCol Then
+                    Dim alterCmd As New SQLiteCommand("ALTER TABLE Task ADD COLUMN alarm_sound TEXT DEFAULT 'default.wav'", connection)
+                    alterCmd.ExecuteNonQuery()
+                    Console.WriteLine("Added alarm_sound column to Task table")
                 End If
+
+                ' Create Holidays table if it doesn't exist
+                Dim createHolidaysCmd As New SQLiteCommand(
+                    "CREATE TABLE IF NOT EXISTS Holidays (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        date TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        is_recurring INTEGER DEFAULT 0,
+                        color TEXT DEFAULT 'Red'
+                    )", connection)
+                createHolidaysCmd.ExecuteNonQuery()
+                Console.WriteLine("Created or verified Holidays table")
             End Using
 
-            Console.WriteLine("Database schema update completed successfully.")
+            Console.WriteLine("Database schema update completed successfully")
         Catch ex As Exception
             MessageBox.Show("Error updating database schema: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try

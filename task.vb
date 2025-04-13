@@ -55,15 +55,31 @@ Public Class Task
 
     Private Sub LoadTaskData()
         Try
-            Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
-                ' Note: The column name in your database is "Comment" with capital C
+            Using connection As SQLiteConnection = DbConnection.GetConnection()
+                ' First check if the columns exist in the Task table
+                Dim colCmd As New SQLiteCommand("PRAGMA table_info(Task)", connection)
+                Dim colReader As SQLiteDataReader = colCmd.ExecuteReader()
+
+                Dim hasAlarmColumn As Boolean = False
+                Dim hasAlarmTimeColumn As Boolean = False
+                Dim hasAlarmSoundColumn As Boolean = False
+
+                While colReader.Read()
+                    Dim colName As String = colReader("name").ToString().ToLower()
+                    If colName = "has_alarm" Then hasAlarmColumn = True
+                    If colName = "alarm_time" Then hasAlarmTimeColumn = True
+                    If colName = "alarm_sound" Then hasAlarmSoundColumn = True
+                End While
+                colReader.Close()
+
+                ' Now load the task data
                 Dim command As New SQLiteCommand("SELECT * FROM Task WHERE todoname = @todoname AND Date = @date", connection)
                 command.Parameters.AddWithValue("@todoname", OriginalNote)
                 command.Parameters.AddWithValue("@date", SelectedDate.ToString("yyyy-MM-dd"))
 
                 Using reader As SQLiteDataReader = command.ExecuteReader()
                     If reader.Read() Then
-                        ' Load task details - note the capital C in "Comment"
+                        ' Load task details (Note: your database uses "Comment" with capital C)
                         comsecbox.Text = reader("Comment").ToString()
 
                         ' Set category
@@ -75,31 +91,26 @@ Public Class Task
                         End If
 
                         ' Load alarm settings if columns exist
-                        Try
-                            If reader.Table.Columns.Contains("has_alarm") Then
-                                Dim hasAlarm As Boolean = Convert.ToBoolean(reader("has_alarm"))
-                                chkAlarm.Checked = hasAlarm
-                                grpAlarm.Enabled = hasAlarm
+                        If hasAlarmColumn Then
+                            Dim hasAlarm As Boolean = Convert.ToBoolean(reader("has_alarm"))
+                            chkAlarm.Checked = hasAlarm
+                            grpAlarm.Enabled = hasAlarm
 
-                                If hasAlarm Then
-                                    ' Load alarm time if available
-                                    If Not IsDBNull(reader("alarm_time")) Then
-                                        Dim alarmTime As DateTime
-                                        If DateTime.TryParse(reader("alarm_time").ToString(), alarmTime) Then
-                                            timePicker.Value = alarmTime
-                                        End If
-                                    End If
-
-                                    ' Load custom sound file if available
-                                    If reader.Table.Columns.Contains("alarm_sound") AndAlso Not IsDBNull(reader("alarm_sound")) Then
-                                        txtSoundFile.Text = reader("alarm_sound").ToString()
+                            If hasAlarm And hasAlarmTimeColumn Then
+                                ' Load alarm time if available
+                                If Not IsDBNull(reader("alarm_time")) Then
+                                    Dim alarmTime As DateTime
+                                    If DateTime.TryParse(reader("alarm_time").ToString(), alarmTime) Then
+                                        timePicker.Value = alarmTime
                                     End If
                                 End If
+
+                                ' Load custom sound file if available
+                                If hasAlarmSoundColumn AndAlso Not IsDBNull(reader("alarm_sound")) Then
+                                    txtSoundFile.Text = reader("alarm_sound").ToString()
+                                End If
                             End If
-                        Catch ex As Exception
-                            ' It's possible the column doesn't exist yet if the schema hasn't been updated
-                            Console.WriteLine("Alarm columns may not exist yet: " & ex.Message)
-                        End Try
+                        End If
                     End If
                 End Using
             End Using
