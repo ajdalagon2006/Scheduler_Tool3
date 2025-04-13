@@ -113,7 +113,7 @@
     <Compile Include="AlarmNotification.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DbHelper.vb" />
+    <Compile Include="DbConnection.vb" />
     <Compile Include="HolidayManager.vb" />
     <Compile Include="Task.Designer.vb">
       <DependentUpon>Task.vb</DependentUpon>
