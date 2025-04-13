@@ -127,7 +127,7 @@
     <Compile Include="calendar.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DbConnection.vb" />
+    <Compile Include="DatabaseInitializer.vb" />
     <Compile Include="forgot.Designer.vb">
       <DependentUpon>forgot.vb</DependentUpon>
     </Compile>

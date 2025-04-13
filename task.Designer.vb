@@ -175,7 +175,7 @@ Partial Class Task
         Me.chkAlarm.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
         Me.chkAlarm.Location = New System.Drawing.Point(16, 271)
         Me.chkAlarm.Name = "chkAlarm"
-        Me.chkAlarm.Size = New System.Drawing.Size(129, 26)
+        Me.chkAlarm.Size = New System.Drawing.Size(133, 26)
         Me.chkAlarm.TabIndex = 20
         Me.chkAlarm.Text = "Set an Alarm"
         Me.chkAlarm.UseVisualStyleBackColor = True
@@ -200,7 +200,7 @@ Partial Class Task
         Me.lblCustomSound.AutoSize = True
         Me.lblCustomSound.Location = New System.Drawing.Point(6, 64)
         Me.lblCustomSound.Name = "lblCustomSound"
-        Me.lblCustomSound.Size = New System.Drawing.Size(112, 19)
+        Me.lblCustomSound.Size = New System.Drawing.Size(115, 19)
         Me.lblCustomSound.TabIndex = 3
         Me.lblCustomSound.Text = "Custom Sound:"
         '
@@ -219,7 +219,7 @@ Partial Class Task
         '
         Me.txtSoundFile.Location = New System.Drawing.Point(10, 86)
         Me.txtSoundFile.Name = "txtSoundFile"
-        Me.txtSoundFile.Size = New System.Drawing.Size(283, 25)
+        Me.txtSoundFile.Size = New System.Drawing.Size(283, 24)
         Me.txtSoundFile.TabIndex = 1
         Me.txtSoundFile.Text = "default.wav"
         '
@@ -230,7 +230,7 @@ Partial Class Task
         Me.timePicker.Location = New System.Drawing.Point(10, 24)
         Me.timePicker.Name = "timePicker"
         Me.timePicker.ShowUpDown = True
-        Me.timePicker.Size = New System.Drawing.Size(120, 25)
+        Me.timePicker.Size = New System.Drawing.Size(120, 24)
         Me.timePicker.TabIndex = 0
         '
         'Task

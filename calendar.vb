@@ -3,21 +3,18 @@
 Public Class calendar
 
     'Modified to add/edit notes to calendar using a form
-
     Private CalendarInfo As MonthlyCalendarInfo
     Private Notes As List(Of String)
     Private NotesDates As List(Of DateTime)
-    Private TasksPanel As Panel
-    Private WithEvents AlarmTimer As New Timer()
+    Private Holidays As Dictionary(Of DateTime, String)
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CalendarInfo = New MonthlyCalendarInfo(Now.Year, Now.Month)
         Notes = New List(Of String)
         NotesDates = New List(Of DateTime)
+        Holidays = New Dictionary(Of DateTime, String)
 
-        ' Create a panel to display tasks when clicking a date
-        CreateTasksPanel()
-
+        ' Set up the UI
         SizeContainers()
         CreateMonthYearLabel()
         SizeMonthYearLabel()
@@ -27,294 +24,203 @@ Public Class calendar
         SizeDaysControls()
         PopulateCalendarInfo()
 
-        ' Load tasks from database
-        LoadTasksFromDatabase()
-
-        ' Load holidays and highlight them
+        ' Initialize new features
+        InitializeDatabase()
         LoadHolidays()
+        LoadNotesFromDatabase()
 
-        ' Set up alarm timer to check every minute
-        AlarmTimer.Interval = 60000 ' 1 minute
+        ' Set up the alarm timer
+        AlarmTimer.Interval = 60000 ' Check every minute
         AlarmTimer.Start()
     End Sub
 
-    Private Sub CreateTasksPanel()
-        TasksPanel = New Panel()
-        TasksPanel.BackColor = Color.FromArgb(246, 243, 220)
-        TasksPanel.BorderStyle = BorderStyle.FixedSingle
-        TasksPanel.Visible = False
-        TasksPanel.AutoScroll = True
+    Private Sub InitializeDatabase()
+        Try
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                ' Create Tasks table if it doesn't exist
+                Dim createTasksTable As New SQLiteCommand(
+                    "CREATE TABLE IF NOT EXISTS Tasks (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        todoname TEXT NOT NULL,
+                        comment TEXT,
+                        date TEXT NOT NULL,
+                        category TEXT NOT NULL,
+                        has_alarm INTEGER DEFAULT 0,
+                        alarm_time TEXT,
+                        alarm_sound TEXT DEFAULT 'default.wav'
+                    )", connection)
+                createTasksTable.ExecuteNonQuery()
 
-        Me.Controls.Add(TasksPanel)
-        TasksPanel.BringToFront()
+                ' Create Holidays table if it doesn't exist
+                Dim createHolidaysTable As New SQLiteCommand(
+                    "CREATE TABLE IF NOT EXISTS Holidays (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        date TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        is_recurring INTEGER DEFAULT 0,
+                        color TEXT DEFAULT 'Red'
+                    )", connection)
+                createHolidaysTable.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Error initializing database: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
-    Private Sub GetSQLiteConnection() As SQLiteConnection
+    Private Function GetSQLiteConnection() As SQLiteConnection
         Dim connectionString As String = "Data Source=Appdatabase.db;Version=3;"
         Dim connection As New SQLiteConnection(connectionString)
         connection.Open()
         Return connection
+    End Function
+
+    Private Sub LoadNotesFromDatabase()
+        Try
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                ' First day in calendar
+                Dim startDate = CalendarInfo.DateInYear(0, 0)
+                ' Last day in calendar
+                Dim endDate = CalendarInfo.DateInYear(5, 6)
+
+                Dim command As New SQLiteCommand(
+                    "SELECT * FROM Tasks WHERE date BETWEEN @startDate AND @endDate",
+                    connection)
+
+                command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"))
+                command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"))
+
+                Using reader As SQLiteDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Dim taskDate As DateTime = DateTime.Parse(reader("date").ToString())
+                        Dim taskName As String = reader("todoname").ToString()
+
+                        ' Add to our lists for display
+                        Notes.Add(taskName)
+                        NotesDates.Add(taskDate)
+                    End While
+                End Using
+            End Using
+
+            ' Show the notes on calendar
+            ShowMonthNotes()
+        Catch ex As Exception
+            ' Table might not exist yet
+            Console.WriteLine("Error loading notes: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub LoadHolidays()
+        Try
+            AddDefaultHolidays()
+
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                ' First day in calendar
+                Dim startDate = CalendarInfo.DateInYear(0, 0)
+                ' Last day in calendar
+                Dim endDate = CalendarInfo.DateInYear(5, 6)
+
+                Dim command As New SQLiteCommand(
+                    "SELECT * FROM Holidays WHERE date BETWEEN @startDate AND @endDate",
+                    connection)
+
+                command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"))
+                command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"))
+
+                Using reader As SQLiteDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Dim holidayDate As DateTime = DateTime.Parse(reader("date").ToString())
+                        Dim holidayName As String = reader("name").ToString()
+
+                        Holidays(holidayDate) = holidayName
+                    End While
+                End Using
+            End Using
+
+            ' Highlight holidays on calendar
+            HighlightHolidays()
+        Catch ex As Exception
+            ' Table might not exist yet
+            Console.WriteLine("Error loading holidays: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub AddDefaultHolidays()
+        Try
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                ' Current year
+                Dim currentYear As Integer = CalendarInfo.Year
+
+                ' List of default holidays
+                Dim defaultHolidays As New List(Of Tuple(Of DateTime, String))()
+                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 1, 1), "New Year's Day"))
+                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 5, 1), "Labor Day"))
+                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 6, 12), "Independence Day"))
+                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 12, 25), "Christmas Day"))
+                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 12, 30), "Rizal Day"))
+
+                ' Insert holidays if they don't exist
+                For Each holiday In defaultHolidays
+                    Dim command As New SQLiteCommand(
+                        "INSERT OR IGNORE INTO Holidays (date, name, is_recurring) VALUES (@date, @name, 1)",
+                        connection)
+
+                    command.Parameters.AddWithValue("@date", holiday.Item1.ToString("yyyy-MM-dd"))
+                    command.Parameters.AddWithValue("@name", holiday.Item2)
+                    command.ExecuteNonQuery()
+                Next
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("Error adding default holidays: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub HighlightHolidays()
+        For Each holiday In Holidays
+            Dim holidayDate As DateTime = holiday.Key
+            Dim holidayName As String = holiday.Value
+
+            ' Find the position on the calendar
+            If CalendarInfo.DateExists(holidayDate) Then
+                Dim row As Integer = CalendarInfo.DateRow(holidayDate)
+                Dim col As Integer = CalendarInfo.DateColumn(holidayDate)
+
+                ' Find the panel for this date
+                Dim panelName As String = String.Format("PnlDay{0}{1}", row, col)
+                Dim panel As Panel = Controls.Find(panelName, True).FirstOrDefault()
+
+                If panel IsNot Nothing Then
+                    ' Create a holiday indicator
+                    Dim indicatorLabel As New Label()
+                    indicatorLabel.Name = String.Format("LblHoliday{0}{1}", row, col)
+                    indicatorLabel.Text = "🎉" ' Holiday emoji
+                    indicatorLabel.ForeColor = Color.Red
+                    indicatorLabel.BackColor = Color.FromArgb(255, 255, 200) ' Light yellow
+                    indicatorLabel.Size = New Size(20, 20)
+                    indicatorLabel.Location = New Point(panel.Width - 25, 5)
+                    indicatorLabel.TextAlign = ContentAlignment.MiddleCenter
+
+                    ' Add tooltip for holiday name
+                    Dim toolTip As New ToolTip()
+                    toolTip.SetToolTip(indicatorLabel, holidayName)
+
+                    panel.Controls.Add(indicatorLabel)
+                End If
+            End If
+        Next
     End Sub
 
     Private Sub SizeContainers()
         ' Existing code...
 
-        ' Size the tasks panel
+        ' Also size the TasksPanel properly
         TasksPanel.Size = New Size(300, 300)
         TasksPanel.Location = New Point((ClientSize.Width - TasksPanel.Width) / 2,
                                        (ClientSize.Height - TasksPanel.Height) / 2)
     End Sub
 
-    Private Sub Form1_ClientSizeChanged(sender As Object, e As EventArgs) Handles MyBase.ClientSizeChanged
-        SizeContainers()
-        SizeMonthYearLabel()
-        SizeDaysOfWeekLabels()
-        SizeDaysControls()
-    End Sub
+    ' Rest of your existing code...
 
-    ' Existing code...
-
-    Private Sub LoadTasksFromDatabase()
-        Try
-            Dim connection = GetConnection()
-            connection.Open()
-
-            Dim startDate As DateTime = CalendarInfo.DateInYear(0, 0) ' First date in grid
-            Dim endDate As DateTime = CalendarInfo.DateInYear(5, 6)   ' Last date in grid
-
-            Dim command As New SQLiteCommand(
-                "SELECT * FROM Task WHERE date BETWEEN @startDate AND @endDate ORDER BY date",
-                connection)
-
-            command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"))
-            command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"))
-
-            Dim reader As SQLiteDataReader = command.ExecuteReader()
-
-            While reader.Read()
-                Dim taskDate As DateTime = DateTime.Parse(reader("date").ToString())
-                Dim taskName As String = reader("todoname").ToString()
-
-                ' Add to Notes and NotesDates lists for compatibility with existing code
-                Notes.Add(taskName)
-                NotesDates.Add(taskDate)
-            End While
-
-            reader.Close()
-            connection.Close()
-        Catch ex As Exception
-            MessageBox.Show("Error loading tasks: " & ex.Message)
-        End Try
-
-        ' After loading, display them on the calendar
-        ShowMonthNotes()
-    End Sub
-
-    'Find and display all notes in calendar range
-    Private Sub ShowMonthNotes()
-        ' Existing code...
-    End Sub
-
-    ' Display tasks for the selected date in the tasks panel
-    Private Sub DisplayTasksForDate(selectedDate As DateTime)
-        TasksPanel.Controls.Clear()
-
-        Dim headerLabel As New Label()
-        headerLabel.Text = "Tasks for " & selectedDate.ToString("MMMM d, yyyy")
-        headerLabel.Font = New Font("Segoe UI", 12, FontStyle.Bold)
-        headerLabel.AutoSize = True
-        headerLabel.Location = New Point(10, 10)
-        TasksPanel.Controls.Add(headerLabel)
-
-        Dim closeButton As New Button()
-        closeButton.Text = "X"
-        closeButton.Size = New Size(25, 25)
-        closeButton.Location = New Point(TasksPanel.Width - 35, 5)
-        closeButton.FlatStyle = FlatStyle.Flat
-        AddHandler closeButton.Click, AddressOf CloseTasksPanel
-        TasksPanel.Controls.Add(closeButton)
-
-        ' Get tasks for the selected date from database
-        Dim y As Integer = 50
-        Try
-            Dim connection = GetConnection()
-            connection.Open()
-
-            Dim command As New SQLiteCommand(
-                "SELECT * FROM Task WHERE date = @date ORDER BY has_alarm DESC",
-                connection)
-
-            command.Parameters.AddWithValue("@date", selectedDate.ToString("yyyy-MM-dd"))
-
-            Dim reader As SQLiteDataReader = command.ExecuteReader()
-            Dim taskCount As Integer = 0
-
-            While reader.Read()
-                Dim taskName As String = reader("todoname").ToString()
-                Dim category As String = reader("category").ToString()
-                Dim hasAlarm As Boolean = Convert.ToBoolean(reader("has_alarm"))
-
-                ' Create panel for each task
-                Dim taskPanel As New Panel()
-                taskPanel.BorderStyle = BorderStyle.FixedSingle
-                taskPanel.Size = New Size(TasksPanel.Width - 30, 60)
-                taskPanel.Location = New Point(10, y)
-
-                ' Task name
-                Dim taskNameLabel As New Label()
-                taskNameLabel.Text = taskName
-                taskNameLabel.Font = New Font("Segoe UI", 10, FontStyle.Bold)
-                taskNameLabel.AutoSize = True
-                taskNameLabel.Location = New Point(5, 5)
-                taskPanel.Controls.Add(taskNameLabel)
-
-                ' Task category
-                Dim categoryLabel As New Label()
-                categoryLabel.Text = category
-                categoryLabel.AutoSize = True
-                categoryLabel.Location = New Point(5, 25)
-                taskPanel.Controls.Add(categoryLabel)
-
-                ' Alarm indicator if task has alarm
-                If hasAlarm Then
-                    Dim alarmLabel As New Label()
-                    alarmLabel.Text = "⏰ " & If(reader("alarm_time") IsNot DBNull.Value,
-                                               DateTime.Parse(reader("alarm_time").ToString()).ToString("h:mm tt"),
-                                               "")
-                    alarmLabel.AutoSize = True
-                    alarmLabel.ForeColor = Color.Red
-                    alarmLabel.Location = New Point(taskPanel.Width - 100, 5)
-                    taskPanel.Controls.Add(alarmLabel)
-                End If
-
-                ' Add edit button
-                Dim editButton As New Button()
-                editButton.Text = "Edit"
-                editButton.Size = New Size(50, 25)
-                editButton.Location = New Point(taskPanel.Width - 120, taskPanel.Height - 30)
-                editButton.Tag = New KeyValuePair(Of String, DateTime)(taskName, selectedDate)
-                AddHandler editButton.Click, AddressOf EditTask_Click
-                taskPanel.Controls.Add(editButton)
-
-                ' Add delete button
-                Dim deleteButton As New Button()
-                deleteButton.Text = "Delete"
-                deleteButton.Size = New Size(50, 25)
-                deleteButton.Location = New Point(taskPanel.Width - 60, taskPanel.Height - 30)
-                deleteButton.Tag = New KeyValuePair(Of String, DateTime)(taskName, selectedDate)
-                AddHandler deleteButton.Click, AddressOf DeleteTask_Click
-                taskPanel.Controls.Add(deleteButton)
-
-                TasksPanel.Controls.Add(taskPanel)
-
-                y += taskPanel.Height + 10
-                taskCount += 1
-            End While
-
-            reader.Close()
-            connection.Close()
-
-            If taskCount = 0 Then
-                Dim noTasksLabel As New Label()
-                noTasksLabel.Text = "No tasks for this date."
-                noTasksLabel.AutoSize = True
-                noTasksLabel.Location = New Point(10, 50)
-                TasksPanel.Controls.Add(noTasksLabel)
-            End If
-
-        Catch ex As Exception
-            MessageBox.Show("Error displaying tasks: " & ex.Message)
-        End Try
-
-        ' Add new task button
-        Dim addButton As New Button()
-        addButton.Text = "Add New Task"
-        addButton.Size = New Size(120, 30)
-        addButton.Location = New Point((TasksPanel.Width - 120) / 2, y + 10)
-        addButton.Tag = selectedDate
-        AddHandler addButton.Click, AddressOf AddNewTask_Click
-        TasksPanel.Controls.Add(addButton)
-
-        TasksPanel.Visible = True
-    End Sub
-
-    Private Sub CloseTasksPanel(sender As Object, e As EventArgs)
-        TasksPanel.Visible = False
-    End Sub
-
-    Private Sub EditTask_Click(sender As Object, e As EventArgs)
-        Dim btn As Button = DirectCast(sender, Button)
-        Dim data As KeyValuePair(Of String, DateTime) = DirectCast(btn.Tag, KeyValuePair(Of String, DateTime))
-        Dim taskName As String = data.Key
-        Dim taskDate As DateTime = data.Value
-
-        ' Open task edit form
-        Dim taskForm As New Task(taskDate, taskName)
-        taskForm.ShowDialog()
-
-        If taskForm.DataSaved Then
-            ' Reload tasks from database and refresh display
-            Notes.Clear()
-            NotesDates.Clear()
-            RemoveMonthNotes()
-            LoadTasksFromDatabase()
-            DisplayTasksForDate(taskDate)
-        End If
-    End Sub
-
-    Private Sub DeleteTask_Click(sender As Object, e As EventArgs)
-        Dim btn As Button = DirectCast(sender, Button)
-        Dim data As KeyValuePair(Of String, DateTime) = DirectCast(btn.Tag, KeyValuePair(Of String, DateTime))
-        Dim taskName As String = data.Key
-        Dim taskDate As DateTime = data.Value
-
-        If MessageBox.Show("Are you sure you want to delete this task?", "Confirm Delete",
-                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Try
-                Dim connection = GetConnection()
-                connection.Open()
-
-                Dim command As New SQLiteCommand(
-                    "DELETE FROM Tasks WHERE date = @date AND todoname = @todoname",
-                    connection)
-
-                command.Parameters.AddWithValue("@date", taskDate.ToString("yyyy-MM-dd"))
-                command.Parameters.AddWithValue("@todoname", taskName)
-                command.ExecuteNonQuery()
-
-                connection.Close()
-
-                ' Reload tasks from database and refresh display
-                Notes.Clear()
-                NotesDates.Clear()
-                RemoveMonthNotes()
-                LoadTasksFromDatabase()
-                DisplayTasksForDate(taskDate)
-            Catch ex As Exception
-                MessageBox.Show("Error deleting task: " & ex.Message)
-            End Try
-        End If
-    End Sub
-
-    Private Sub AddNewTask_Click(sender As Object, e As EventArgs)
-        Dim btn As Button = DirectCast(sender, Button)
-        Dim taskDate As DateTime = DirectCast(btn.Tag, DateTime)
-
-        ' Open task creation form
-        Dim taskForm As New Task(taskDate)
-        taskForm.ShowDialog()
-
-        If taskForm.DataSaved Then
-            ' Reload tasks from database and refresh display
-            Notes.Clear()
-            NotesDates.Clear()
-            RemoveMonthNotes()
-            LoadTasksFromDatabase()
-            DisplayTasksForDate(taskDate)
-        End If
-    End Sub
-
-    'Add/Edit note in list and refresh calendar - modified to show tasks panel
+    'Add/Edit note in list and refresh calendar
     Private Sub Day_DoubleClick(ByVal sender As Object, e As MouseEventArgs)
         Dim rowIndex As Integer
         Dim columnIndex As Integer
@@ -325,206 +231,285 @@ Public Class calendar
         columnIndex = ExtractLastDigit(control.Name)
         Dim selectedDate As DateTime = CalendarInfo.DateInYear(rowIndex, columnIndex)
 
-        ' Display tasks panel for the selected date
+        ' Display the tasks panel instead of directly showing the task form
         DisplayTasksForDate(selectedDate)
     End Sub
 
-    ' Rest of the code...
+    Private Sub DisplayTasksForDate(selectedDate As DateTime)
+        ' Clear existing controls
+        TasksPanel.Controls.Clear()
 
-    ' Alarm checking logic
+        ' Create panel header
+        Dim headerLabel As New Label()
+        headerLabel.Text = "Tasks for " & selectedDate.ToString("MMMM d, yyyy")
+        headerLabel.Font = New Font("Segoe UI", 12, FontStyle.Bold)
+        headerLabel.AutoSize = True
+        headerLabel.Location = New Point(10, 10)
+        TasksPanel.Controls.Add(headerLabel)
+
+        ' Add close button
+        Dim closeButton As New Button()
+        closeButton.Text = "×"
+        closeButton.Font = New Font("Segoe UI", 12, FontStyle.Bold)
+        closeButton.FlatStyle = FlatStyle.Flat
+        closeButton.Size = New Size(30, 30)
+        closeButton.Location = New Point(TasksPanel.Width - 40, 5)
+        AddHandler closeButton.Click, Sub(s, args) TasksPanel.Visible = False
+        TasksPanel.Controls.Add(closeButton)
+
+        ' Check if this date is a holiday
+        If Holidays.ContainsKey(selectedDate) Then
+            Dim holidayLabel As New Label()
+            holidayLabel.Text = "Holiday: " & Holidays(selectedDate)
+            holidayLabel.ForeColor = Color.Red
+            holidayLabel.Font = New Font("Segoe UI", 10, FontStyle.Italic)
+            holidayLabel.AutoSize = True
+            holidayLabel.Location = New Point(10, 40)
+            TasksPanel.Controls.Add(holidayLabel)
+        End If
+
+        ' Load and display tasks
+        Try
+            Dim tasks As New List(Of Tuple(Of String, String, Boolean, String))() ' Name, Category, HasAlarm, AlarmTime
+
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                Dim command As New SQLiteCommand(
+                    "SELECT * FROM Tasks WHERE date = @date ORDER BY has_alarm DESC",
+                    connection)
+
+                command.Parameters.AddWithValue("@date", selectedDate.ToString("yyyy-MM-dd"))
+
+                Using reader As SQLiteDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Dim taskName As String = reader("todoname").ToString()
+                        Dim category As String = reader("category").ToString()
+
+                        Dim hasAlarm As Boolean = False
+                        Dim alarmTime As String = ""
+
+                        If reader.Table.Columns.Contains("has_alarm") Then
+                            hasAlarm = Convert.ToBoolean(reader("has_alarm"))
+                            If hasAlarm AndAlso Not IsDBNull(reader("alarm_time")) Then
+                                Dim dt As DateTime
+                                If DateTime.TryParse(reader("alarm_time").ToString(), dt) Then
+                                    alarmTime = dt.ToString("h:mm tt")
+                                End If
+                            End If
+                        End If
+
+                        tasks.Add(New Tuple(Of String, String, Boolean, String)(taskName, category, hasAlarm, alarmTime))
+                    End While
+                End Using
+            End Using
+
+            ' Display tasks in the panel
+            Dim yPosition As Integer = If(Holidays.ContainsKey(selectedDate), 70, 50)
+
+            If tasks.Count = 0 Then
+                ' Show "No tasks" message
+                Dim noTasksLabel As New Label()
+                noTasksLabel.Text = "No tasks for this date."
+                noTasksLabel.Font = New Font("Segoe UI", 9, FontStyle.Italic)
+                noTasksLabel.AutoSize = True
+                noTasksLabel.Location = New Point(10, yPosition)
+                TasksPanel.Controls.Add(noTasksLabel)
+                yPosition += 30
+            Else
+                ' Display each task
+                For Each task In tasks
+                    ' Create a task panel
+                    Dim taskPanel As New Panel()
+                    taskPanel.BorderStyle = BorderStyle.FixedSingle
+                    taskPanel.Size = New Size(TasksPanel.Width - 20, 60)
+                    taskPanel.Location = New Point(10, yPosition)
+
+                    ' Task name
+                    Dim taskNameLabel As New Label()
+                    taskNameLabel.Text = task.Item1
+                    taskNameLabel.Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                    taskNameLabel.AutoSize = True
+                    taskNameLabel.Location = New Point(5, 5)
+                    taskPanel.Controls.Add(taskNameLabel)
+
+                    ' Category
+                    Dim categoryLabel As New Label()
+                    categoryLabel.Text = task.Item2
+                    categoryLabel.AutoSize = True
+                    categoryLabel.Location = New Point(5, 25)
+                    taskPanel.Controls.Add(categoryLabel)
+
+                    ' Show alarm indicator if task has alarm
+                    If task.Item3 Then
+                        Dim alarmIndicator As New Label()
+                        alarmIndicator.Text = "⏰ " & task.Item4
+                        alarmIndicator.ForeColor = Color.Red
+                        alarmIndicator.AutoSize = True
+                        alarmIndicator.Location = New Point(taskPanel.Width - 100, 5)
+                        taskPanel.Controls.Add(alarmIndicator)
+                    End If
+
+                    ' Edit button
+                    Dim editButton As New Button()
+                    editButton.Text = "Edit"
+                    editButton.Size = New Size(50, 23)
+                    editButton.Location = New Point(taskPanel.Width - 115, 30)
+                    editButton.Tag = task.Item1 ' Store task name in tag
+                    AddHandler editButton.Click, Sub(s, args)
+                                                     EditTask(selectedDate, DirectCast(DirectCast(s, Button).Tag, String))
+                                                 End Sub
+                    taskPanel.Controls.Add(editButton)
+
+                    ' Delete button
+                    Dim deleteButton As New Button()
+                    deleteButton.Text = "Delete"
+                    deleteButton.Size = New Size(50, 23)
+                    deleteButton.Location = New Point(taskPanel.Width - 60, 30)
+                    deleteButton.Tag = task.Item1 ' Store task name in tag
+                    AddHandler deleteButton.Click, Sub(s, args)
+                                                       DeleteTask(selectedDate, DirectCast(DirectCast(s, Button).Tag, String))
+                                                   End Sub
+                    taskPanel.Controls.Add(deleteButton)
+
+                    TasksPanel.Controls.Add(taskPanel)
+                    yPosition += taskPanel.Height + 5
+                Next
+            End If
+
+            ' Add "New Task" button at the bottom
+            Dim addButton As New Button()
+            addButton.Text = "Add New Task"
+            addButton.Size = New Size(120, 30)
+            addButton.Location = New Point((TasksPanel.Width - 120) / 2, yPosition + 10)
+            addButton.Tag = selectedDate
+            AddHandler addButton.Click, Sub(s, args)
+                                            AddNewTask(DirectCast(DirectCast(s, Button).Tag, DateTime))
+                                        End Sub
+            TasksPanel.Controls.Add(addButton)
+        Catch ex As Exception
+            MessageBox.Show("Error displaying tasks: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+
+        ' Make the panel visible
+        TasksPanel.Visible = True
+    End Sub
+
+    Private Sub AddNewTask(selectedDate As DateTime)
+        Dim taskForm As New Task(selectedDate)
+        taskForm.ShowDialog()
+
+        If taskForm.DataSaved Then
+            ' Refresh tasks display
+            Notes.Clear()
+            NotesDates.Clear()
+            RemoveMonthNotes()
+            LoadNotesFromDatabase()
+            DisplayTasksForDate(selectedDate)
+        End If
+    End Sub
+
+    Private Sub EditTask(selectedDate As DateTime, taskName As String)
+        Dim taskForm As New Task(selectedDate, taskName)
+        taskForm.ShowDialog()
+
+        If taskForm.DataSaved Then
+            ' Refresh tasks display
+            Notes.Clear()
+            NotesDates.Clear()
+            RemoveMonthNotes()
+            LoadNotesFromDatabase()
+            DisplayTasksForDate(selectedDate)
+        End If
+    End Sub
+
+    Private Sub DeleteTask(selectedDate As DateTime, taskName As String)
+        If MessageBox.Show("Are you sure you want to delete this task?", "Confirm Delete",
+                          MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+            Try
+                Using connection As SQLiteConnection = GetSQLiteConnection()
+                    Dim command As New SQLiteCommand(
+                        "DELETE FROM Tasks WHERE date = @date AND todoname = @taskName",
+                        connection)
+
+                    command.Parameters.AddWithValue("@date", selectedDate.ToString("yyyy-MM-dd"))
+                    command.Parameters.AddWithValue("@taskName", taskName)
+                    command.ExecuteNonQuery()
+                End Using
+
+                ' Refresh tasks display
+                Notes.Clear()
+                NotesDates.Clear()
+                RemoveMonthNotes()
+                LoadNotesFromDatabase()
+                DisplayTasksForDate(selectedDate)
+            Catch ex As Exception
+                MessageBox.Show("Error deleting task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End If
+    End Sub
+
+    ' Alarm checking functionality
     Private Sub AlarmTimer_Tick(sender As Object, e As EventArgs) Handles AlarmTimer.Tick
         CheckForAlarms()
     End Sub
 
     Private Sub CheckForAlarms()
         Try
-            Dim currentDateTime = DateTime.Now
-            Dim currentDateTimeStr = currentDateTime.ToString("yyyy-MM-dd HH:mm")
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                ' Get current time
+                Dim currentTime As DateTime = DateTime.Now
+                Dim currentTimeString As String = currentTime.ToString("yyyy-MM-dd HH:mm")
 
-            ' Check within a minute window
-            Dim connection = GetConnection()
-            connection.Open()
+                ' Find alarms that should trigger now (within the minute)
+                Dim command As New SQLiteCommand(
+                    "SELECT * FROM Tasks WHERE has_alarm = 1 AND strftime('%Y-%m-%d %H:%M', alarm_time) = @currentTime",
+                    connection)
 
-            ' Find alarms that should trigger within the current minute
-            Dim command As New SQLiteCommand(
-                "SELECT * FROM Tasks WHERE has_alarm = 1 AND " &
-                "strftime('%Y-%m-%d %H:%M', alarm_time) = @currentTime",
-                connection)
+                command.Parameters.AddWithValue("@currentTime", currentTimeString)
 
-            command.Parameters.AddWithValue("@currentTime", currentDateTime.ToString("yyyy-MM-dd HH:mm"))
+                Using reader As SQLiteDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Dim taskName As String = reader("todoname").ToString()
+                        Dim taskDesc As String = If(reader("comment") IsNot DBNull.Value, reader("comment").ToString(), "")
 
-            Dim reader As SQLiteDataReader = command.ExecuteReader()
+                        ' Get sound file if specified
+                        Dim soundFile As String = "default.wav"
+                        If reader.Table.Columns.Contains("alarm_sound") AndAlso Not IsDBNull(reader("alarm_sound")) Then
+                            soundFile = reader("alarm_sound").ToString()
+                        End If
 
-            While reader.Read()
-                Dim taskName As String = reader("todoname").ToString()
-                Dim taskComment As String = If(reader("comment") IsNot DBNull.Value, reader("comment").ToString(), "")
-                Dim soundFile As String = If(reader("alarm_sound") IsNot DBNull.Value, reader("alarm_sound").ToString(), "default.wav")
+                        ' Show notification
+                        ShowAlarmNotification(taskName, taskDesc)
 
-                ' Play alarm sound
-                PlayAlarmSound(soundFile)
-
-                ' Show notification
-                ShowAlarmNotification(taskName, taskComment)
-            End While
-
-            reader.Close()
-            connection.Close()
-
+                        ' Play sound
+                        PlayAlarmSound(soundFile)
+                    End While
+                End Using
+            End Using
         Catch ex As Exception
             ' Log error but don't show message box as this runs in background
             Console.WriteLine("Error checking alarms: " & ex.Message)
         End Try
     End Sub
 
+    Private Sub ShowAlarmNotification(taskName As String, taskDesc As String)
+        Dim notification As New AlarmNotification(taskName, taskDesc)
+        notification.Show()
+    End Sub
+
     Private Sub PlayAlarmSound(soundFile As String)
         Try
-            If Not System.IO.File.Exists(soundFile) AndAlso Not soundFile = "default.wav" Then
-                ' Fall back to default sound
-                soundFile = "default.wav"
-            End If
-
-            ' Use My.Computer.Audio.Play for sound playback
-            If soundFile = "default.wav" Then
-                ' Use system sound
-                My.Computer.Audio.PlaySystemSound(System.Media.SystemSounds.Exclamation)
+            If soundFile = "default.wav" OrElse Not System.IO.File.Exists(soundFile) Then
+                ' Play system sound
+                My.Computer.Audio.PlaySystemSound(Media.SystemSounds.Exclamation)
             Else
                 ' Play custom sound file
                 My.Computer.Audio.Play(soundFile, AudioPlayMode.Background)
             End If
         Catch ex As Exception
             ' Fall back to system sound if there's an error
-            My.Computer.Audio.PlaySystemSound(System.Media.SystemSounds.Exclamation)
+            My.Computer.Audio.PlaySystemSound(Media.SystemSounds.Exclamation)
         End Try
     End Sub
 
-    Private Sub ShowAlarmNotification(taskName As String, taskComment As String)
-        ' Create notification form
-        Dim notification As New AlarmNotification(taskName, taskComment)
-        notification.Show()
-    End Sub
-
-    ' Holiday handling logic
-    Private Sub LoadHolidays()
-        ' First, let's add some default holidays
-        AddDefaultHolidays()
-
-        ' Then load custom holidays from database if you have them
-        LoadCustomHolidays()
-
-        ' Highlight holiday dates on calendar
-        HighlightHolidays()
-    End Sub
-
-    Private Sub AddDefaultHolidays()
-        ' Add some common Philippine holidays as an example
-        Dim holidaysList As New List(Of KeyValuePair(Of DateTime, String))
-
-        ' Add holidays for current year
-        Dim currentYear As Integer = CalendarInfo.Year
-
-        ' Fixed holidays
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 1, 1), "New Year's Day"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 4, 9), "Araw ng Kagitingan"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 5, 1), "Labor Day"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 6, 12), "Independence Day"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 8, 30), "National Heroes Day"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 11, 30), "Bonifacio Day"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 12, 25), "Christmas Day"))
-        holidaysList.Add(New KeyValuePair(Of DateTime, String)(New DateTime(currentYear, 12, 30), "Rizal Day"))
-
-        ' Save to database
-        Try
-            Dim connection = GetConnection()
-            connection.Open()
-
-            ' First, create the table if it doesn't exist
-            Dim createTableCmd As New SQLiteCommand(
-                "CREATE TABLE IF NOT EXISTS Holidays (date TEXT PRIMARY KEY, name TEXT NOT NULL)",
-                connection)
-            createTableCmd.ExecuteNonQuery()
-
-            ' Insert holidays
-            For Each holiday In holidaysList
-                Dim command As New SQLiteCommand(
-                    "INSERT OR IGNORE INTO Holidays (date, name) VALUES (@date, @name)",
-                    connection)
-
-                command.Parameters.AddWithValue("@date", holiday.Key.ToString("yyyy-MM-dd"))
-                command.Parameters.AddWithValue("@name", holiday.Value)
-                command.ExecuteNonQuery()
-            Next
-
-            connection.Close()
-        Catch ex As Exception
-            MessageBox.Show("Error adding default holidays: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub LoadCustomHolidays()
-        ' Load custom holidays from database if you want to implement this feature
-    End Sub
-
-    Private Sub HighlightHolidays()
-        Try
-            Dim connection = GetConnection()
-            connection.Open()
-
-            Dim startDate As DateTime = CalendarInfo.DateInYear(0, 0) ' First date in grid
-            Dim endDate As DateTime = CalendarInfo.DateInYear(5, 6)   ' Last date in grid
-
-            Dim command As New SQLiteCommand(
-                "SELECT * FROM Holidays WHERE date BETWEEN @startDate AND @endDate",
-                connection)
-
-            command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"))
-            command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"))
-
-            Dim reader As SQLiteDataReader = command.ExecuteReader()
-
-            While reader.Read()
-                Dim holidayDate As DateTime = DateTime.Parse(reader("date").ToString())
-                Dim holidayName As String = reader("name").ToString()
-
-                ' Find the grid position for this date
-                If CalendarInfo.DateExists(holidayDate) Then
-                    Dim row As Integer = CalendarInfo.DateRow(holidayDate)
-                    Dim col As Integer = CalendarInfo.DateColumn(holidayDate)
-
-                    ' Highlight the date by modifying the panel or adding an indicator
-                    HighlightDateAsHoliday(row, col, holidayName)
-                End If
-            End While
-
-            reader.Close()
-            connection.Close()
-        Catch ex As Exception
-            MessageBox.Show("Error highlighting holidays: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub HighlightDateAsHoliday(rowIndex As Integer, colIndex As Integer, holidayName As String)
-        ' Find the panel for this day
-        Dim panelName As String = String.Format("PnlDay{0}{1}", rowIndex, colIndex)
-        Dim panel As Panel = Controls.Find(panelName, True).FirstOrDefault()
-
-        If panel IsNot Nothing Then
-            ' Add holiday indicator
-            Dim indicator As New Label()
-            indicator.Name = "LblHoliday" & rowIndex & colIndex
-            indicator.Text = "🎉" ' Holiday emoji
-            indicator.ForeColor = Color.Red
-            indicator.BackColor = Color.LightYellow
-            indicator.Font = New Font("Segoe UI", 9, FontStyle.Bold)
-            indicator.Size = New Size(20, 20)
-            indicator.Location = New Point(panel.Width - 25, 2)
-            indicator.TextAlign = ContentAlignment.MiddleCenter
-            indicator.ToolTipText = holidayName
-
-            ' Add tooltip for the holiday name
-            Dim toolTip As New ToolTip()
-            toolTip.SetToolTip(indicator, holidayName)
-
-            panel.Controls.Add(indicator)
-        End If
-    End Sub
+    ' Existing code and methods...
 End Class

@@ -8,16 +8,14 @@ Public Class Task
     Private IsEdit As Boolean
     Private SelectedDate As DateTime
     Private OriginalNote As String
-    Private Connection As SQLiteConnection
-    Private OpenSoundFileDialog As New OpenFileDialog()
+    Private openSoundDialog As New OpenFileDialog()
 
     Public Sub New(d As DateTime)
         InitializeComponent()
 
         IsEdit = False
         SelectedDate = d
-        Connection = GetConnection()
-        SetupSoundDialog()
+        SetupOpenFileDialog()
     End Sub
 
     Public Sub New(d As DateTime, text As String)
@@ -26,13 +24,12 @@ Public Class Task
         IsEdit = True
         SelectedDate = d
         OriginalNote = text
-        Connection = GetConnection()
-        SetupSoundDialog()
+        SetupOpenFileDialog()
     End Sub
 
-    Private Sub SetupSoundDialog()
-        OpenSoundFileDialog.Filter = "Sound files (*.wav;*.mp3)|*.wav;*.mp3|All files (*.*)|*.*"
-        OpenSoundFileDialog.Title = "Select Alarm Sound"
+    Private Sub SetupOpenFileDialog()
+        openSoundDialog.Filter = "Sound Files (*.wav;*.mp3)|*.wav;*.mp3|All files (*.*)|*.*"
+        openSoundDialog.Title = "Select Alarm Sound"
     End Sub
 
     Private Sub Task_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -47,115 +44,198 @@ Public Class Task
             Me.Text = "Edit"
             todobox.Text = OriginalNote
 
-            ' Load saved task data including alarm settings
+            ' Load task data if editing
             LoadTaskData()
         Else
             Me.Text = "Add"
             todobox.Clear()
             comsecbox.Clear()
-            e1.Checked = True
+            e1.Checked = True ' Default to Event
         End If
     End Sub
 
     Private Sub LoadTaskData()
         Try
-            Connection.Open()
-            Dim command As New SQLiteCommand("SELECT * FROM Tasks WHERE date = @date AND todoname = @todoname", Connection)
-            command.Parameters.AddWithValue("@date", SelectedDate.ToString("yyyy-MM-dd"))
-            command.Parameters.AddWithValue("@todoname", OriginalNote)
+            ' First ensure the Tasks table exists
+            CreateTasksTableIfNeeded()
 
-            Dim reader As SQLiteDataReader = command.ExecuteReader()
-            If reader.Read() Then
-                todobox.Text = reader("todoname").ToString()
-                comsecbox.Text = If(reader("comment") IsNot DBNull.Value, reader("comment").ToString(), "")
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                Dim command As New SQLiteCommand("SELECT * FROM Tasks WHERE todoname = @todoname AND date = @date", connection)
+                command.Parameters.AddWithValue("@todoname", OriginalNote)
+                command.Parameters.AddWithValue("@date", SelectedDate.ToString("yyyy-MM-dd"))
 
-                Dim category As String = reader("category").ToString()
-                If category = "Event" Then
-                    e1.Checked = True
-                Else
-                    s1.Checked = True
-                End If
+                Using reader As SQLiteDataReader = command.ExecuteReader()
+                    If reader.Read() Then
+                        ' Load task details
+                        comsecbox.Text = reader("comment").ToString()
 
-                ' Load alarm settings
-                Dim hasAlarm As Boolean = Convert.ToBoolean(reader("has_alarm"))
-                chkAlarm.Checked = hasAlarm
-                grpAlarm.Enabled = hasAlarm
+                        ' Set category
+                        Dim category As String = reader("category").ToString()
+                        If category = "Event" Then
+                            e1.Checked = True
+                        Else
+                            s1.Checked = True
+                        End If
 
-                If hasAlarm Then
-                    Dim alarmTimeStr As String = reader("alarm_time").ToString()
-                    If Not String.IsNullOrEmpty(alarmTimeStr) Then
-                        Dim alarmTime As DateTime = DateTime.Parse(alarmTimeStr)
-                        timePicker.Value = alarmTime
+                        ' Load alarm settings if they exist
+                        If reader.Table.Columns.Contains("has_alarm") Then
+                            Dim hasAlarm As Boolean = Convert.ToBoolean(reader("has_alarm"))
+                            chkAlarm.Checked = hasAlarm
+                            grpAlarm.Enabled = hasAlarm
+
+                            If hasAlarm Then
+                                ' Load alarm time if available
+                                If Not IsDBNull(reader("alarm_time")) Then
+                                    Dim alarmTime As DateTime
+                                    If DateTime.TryParse(reader("alarm_time").ToString(), alarmTime) Then
+                                        timePicker.Value = alarmTime
+                                    End If
+                                End If
+
+                                ' Load custom sound file if available
+                                If reader.Table.Columns.Contains("alarm_sound") AndAlso Not IsDBNull(reader("alarm_sound")) Then
+                                    txtSoundFile.Text = reader("alarm_sound").ToString()
+                                End If
+                            End If
+                        End If
                     End If
-
-                    txtSoundFile.Text = If(reader("alarm_sound") IsNot DBNull.Value, reader("alarm_sound").ToString(), "default.wav")
-                End If
-            End If
-            reader.Close()
+                End Using
+            End Using
         Catch ex As Exception
             MessageBox.Show("Error loading task data: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        Finally
-            If Connection.State = ConnectionState.Open Then
-                Connection.Close()
-            End If
+        End Try
+    End Sub
+
+    Private Sub CreateTasksTableIfNeeded()
+        Try
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                ' Check if Tasks table exists
+                Dim checkTableCmd As New SQLiteCommand(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='Tasks'", connection)
+
+                Dim tableExists As Object = checkTableCmd.ExecuteScalar()
+
+                If tableExists Is Nothing Then
+                    ' Create Tasks table with alarm support
+                    Dim createTableCmd As New SQLiteCommand(
+                        "CREATE TABLE Tasks (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            todoname TEXT NOT NULL,
+                            comment TEXT,
+                            date TEXT NOT NULL,
+                            category TEXT NOT NULL,
+                            has_alarm INTEGER DEFAULT 0,
+                            alarm_time TEXT,
+                            alarm_sound TEXT DEFAULT 'default.wav'
+                        )", connection)
+
+                    createTableCmd.ExecuteNonQuery()
+                Else
+                    ' Check if we need to add alarm columns to an existing table
+                    Dim checkColumnsCmd As New SQLiteCommand(
+                        "PRAGMA table_info(Tasks)", connection)
+
+                    Dim hasAlarmColumn As Boolean = False
+
+                    Using reader As SQLiteDataReader = checkColumnsCmd.ExecuteReader()
+                        While reader.Read()
+                            If reader("name").ToString().Equals("has_alarm") Then
+                                hasAlarmColumn = True
+                                Exit While
+                            End If
+                        End While
+                    End Using
+
+                    ' Add alarm columns if they don't exist
+                    If Not hasAlarmColumn Then
+                        Dim alterTableCmd As New SQLiteCommand(
+                            "ALTER TABLE Tasks ADD COLUMN has_alarm INTEGER DEFAULT 0", connection)
+                        alterTableCmd.ExecuteNonQuery()
+
+                        alterTableCmd = New SQLiteCommand(
+                            "ALTER TABLE Tasks ADD COLUMN alarm_time TEXT", connection)
+                        alterTableCmd.ExecuteNonQuery()
+
+                        alterTableCmd = New SQLiteCommand(
+                            "ALTER TABLE Tasks ADD COLUMN alarm_sound TEXT DEFAULT 'default.wav'", connection)
+                        alterTableCmd.ExecuteNonQuery()
+                    End If
+                End If
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Error setting up database: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
     Private Sub SaveTask()
-        If SelectedDate < Now.Date AndAlso Not IsEdit Then
-            MessageBox.Show("Cannot add task to a past date!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return
-        End If
-
         If String.IsNullOrWhiteSpace(todobox.Text) Then
             MessageBox.Show("Task name cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Return
         End If
 
         Try
-            Connection.Open()
-            Dim command As SQLiteCommand
-            If IsEdit Then
-                command = New SQLiteCommand("UPDATE Tasks SET todoname = @todoname, comment = @comment, category = @category, has_alarm = @hasAlarm, alarm_time = @alarmTime, alarm_sound = @alarmSound WHERE date = @date AND todoname = @originalNote", Connection)
-                command.Parameters.AddWithValue("@originalNote", OriginalNote)
-            Else
-                command = New SQLiteCommand("INSERT INTO Tasks (todoname, comment, date, category, has_alarm, alarm_time, alarm_sound) VALUES (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", Connection)
-            End If
+            Using connection As SQLiteConnection = GetSQLiteConnection()
+                Dim command As SQLiteCommand
 
-            command.Parameters.AddWithValue("@todoname", todobox.Text)
-            command.Parameters.AddWithValue("@comment", comsecbox.Text)
-            command.Parameters.AddWithValue("@date", SelectedDate.ToString("yyyy-MM-dd"))
-            command.Parameters.AddWithValue("@category", If(e1.Checked, "Event", "School Works"))
-            command.Parameters.AddWithValue("@hasAlarm", chkAlarm.Checked)
+                If IsEdit Then
+                    command = New SQLiteCommand(
+                        "UPDATE Tasks SET 
+                        todoname = @todoname, 
+                        comment = @comment, 
+                        category = @category,
+                        has_alarm = @hasAlarm,
+                        alarm_time = @alarmTime,
+                        alarm_sound = @alarmSound
+                        WHERE todoname = @originalName AND date = @date", connection)
 
-            If chkAlarm.Checked Then
-                command.Parameters.AddWithValue("@alarmTime", timePicker.Value.ToString("yyyy-MM-dd HH:mm:ss"))
-                command.Parameters.AddWithValue("@alarmSound", txtSoundFile.Text)
-            Else
-                command.Parameters.AddWithValue("@alarmTime", DBNull.Value)
-                command.Parameters.AddWithValue("@alarmSound", "default.wav")
-            End If
+                    command.Parameters.AddWithValue("@originalName", OriginalNote)
+                Else
+                    command = New SQLiteCommand(
+                        "INSERT INTO Tasks 
+                        (todoname, comment, date, category, has_alarm, alarm_time, alarm_sound) 
+                        VALUES 
+                        (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
+                End If
 
-            command.ExecuteNonQuery()
+                command.Parameters.AddWithValue("@todoname", todobox.Text)
+                command.Parameters.AddWithValue("@comment", comsecbox.Text)
+                command.Parameters.AddWithValue("@date", SelectedDate.ToString("yyyy-MM-dd"))
+                command.Parameters.AddWithValue("@category", If(e1.Checked, "Event", "School Works"))
+                command.Parameters.AddWithValue("@hasAlarm", chkAlarm.Checked)
 
-            DataSaved = True
-            NewNote = todobox.Text
+                If chkAlarm.Checked Then
+                    ' Combine the selected date with the time from timePicker
+                    Dim alarmTime As New DateTime(
+                        SelectedDate.Year,
+                        SelectedDate.Month,
+                        SelectedDate.Day,
+                        timePicker.Value.Hour,
+                        timePicker.Value.Minute,
+                        0)
+
+                    command.Parameters.AddWithValue("@alarmTime", alarmTime.ToString("yyyy-MM-dd HH:mm:ss"))
+                    command.Parameters.AddWithValue("@alarmSound", txtSoundFile.Text)
+                Else
+                    command.Parameters.AddWithValue("@alarmTime", DBNull.Value)
+                    command.Parameters.AddWithValue("@alarmSound", "default.wav")
+                End If
+
+                command.ExecuteNonQuery()
+
+                DataSaved = True
+                NewNote = todobox.Text
+            End Using
         Catch ex As Exception
             MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             DataSaved = False
-        Finally
-            If Connection.State = ConnectionState.Open Then
-                Connection.Close()
-            End If
-
-            If DataSaved Then
-                Me.Close()
-            End If
         End Try
     End Sub
 
     Private Sub createbtn_Click(sender As Object, e As EventArgs) Handles createbtn.Click
         SaveTask()
+        If DataSaved Then
+            Me.Close()
+        End If
     End Sub
 
     Private Sub Cancelbtn_Click(sender As Object, e As EventArgs) Handles Cancelbtn.Click
@@ -164,12 +244,13 @@ Public Class Task
     End Sub
 
     Private Sub chkAlarm_CheckedChanged(sender As Object, e As EventArgs) Handles chkAlarm.CheckedChanged
+        ' Enable/disable alarm settings group based on checkbox
         grpAlarm.Enabled = chkAlarm.Checked
     End Sub
 
     Private Sub btnBrowseSound_Click(sender As Object, e As EventArgs) Handles btnBrowseSound.Click
-        If OpenSoundFileDialog.ShowDialog() = DialogResult.OK Then
-            txtSoundFile.Text = OpenSoundFileDialog.FileName
+        If openSoundDialog.ShowDialog() = DialogResult.OK Then
+            txtSoundFile.Text = openSoundDialog.FileName
         End If
     End Sub
 End Class

@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class calendar
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class calendar
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.DaysRow5Container = New System.Windows.Forms.Panel()
@@ -33,6 +33,8 @@ Partial Class calendar
         Me.MonthYearContainer = New System.Windows.Forms.Panel()
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TasksPanel = New System.Windows.Forms.Panel()
+        Me.AlarmTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -112,11 +114,26 @@ Partial Class calendar
         Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
         Me.DeleteToolStripMenuItem.Text = "Delete"
         '
+        'TasksPanel
+        '
+        Me.TasksPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(246, Byte), Integer), CType(CType(243, Byte), Integer), CType(CType(220, Byte), Integer))
+        Me.TasksPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TasksPanel.Location = New System.Drawing.Point(250, 75)
+        Me.TasksPanel.Name = "TasksPanel"
+        Me.TasksPanel.Size = New System.Drawing.Size(300, 300)
+        Me.TasksPanel.TabIndex = 15
+        Me.TasksPanel.Visible = False
+        '
+        'AlarmTimer
+        '
+        Me.AlarmTimer.Interval = 60000
+        '
         'calendar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.TasksPanel)
         Me.Controls.Add(Me.DaysRow5Container)
         Me.Controls.Add(Me.DaysRow4Container)
         Me.Controls.Add(Me.DaysRow3Container)
@@ -142,4 +159,6 @@ Partial Class calendar
     Friend WithEvents MonthYearContainer As Panel
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents DeleteToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents TasksPanel As Panel
+    Friend WithEvents AlarmTimer As Timer
 End Class
