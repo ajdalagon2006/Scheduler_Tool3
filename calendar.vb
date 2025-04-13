@@ -43,34 +43,31 @@ Public Class calendar
 #Region "UI Layout Methods"
 
     Private Sub SizeContainers()
+
         Dim daysHeight As Integer
         Dim daysYStart As Integer
 
-        MonthYearContainer.Size = New Size(ClientSize.Width - 20, 50)
-        MonthYearContainer.Location = New Point(10, 10)
-        DaysOfWeekContainer.Size = New Size(ClientSize.Width - 20, 30)
-        DaysOfWeekContainer.Location = New Point(10, MonthYearContainer.Bottom + 5)
+        MonthYearContainer.Size = New Size(ClientSize.Width, 55)
+        MonthYearContainer.Location = New Point(0, 0)
+        DaysOfWeekContainer.Size = New Size(ClientSize.Width, 30)
+        DaysOfWeekContainer.Location = New Point(0, MonthYearContainer.Height)
 
-        daysHeight = (ClientSize.Height - MonthYearContainer.Height - DaysOfWeekContainer.Height - 50) / 6
-        daysYStart = DaysOfWeekContainer.Bottom + 5
+        daysHeight = (ClientSize.Height - MonthYearContainer.Height - DaysOfWeekContainer.Height) / 6
+        daysYStart = MonthYearContainer.Height + DaysOfWeekContainer.Height
 
-        DaysRow0Container.Size = New Size(ClientSize.Width - 20, daysHeight)
-        DaysRow0Container.Location = New Point(10, daysYStart)
-        DaysRow1Container.Size = New Size(ClientSize.Width - 20, daysHeight)
-        DaysRow1Container.Location = New Point(10, daysYStart + (daysHeight))
-        DaysRow2Container.Size = New Size(ClientSize.Width - 20, daysHeight)
-        DaysRow2Container.Location = New Point(10, daysYStart + (daysHeight * 2))
-        DaysRow3Container.Size = New Size(ClientSize.Width - 20, daysHeight)
-        DaysRow3Container.Location = New Point(10, daysYStart + (daysHeight * 3))
-        DaysRow4Container.Size = New Size(ClientSize.Width - 20, daysHeight)
-        DaysRow4Container.Location = New Point(10, daysYStart + (daysHeight * 4))
-        DaysRow5Container.Size = New Size(ClientSize.Width - 20, daysHeight)
-        DaysRow5Container.Location = New Point(10, daysYStart + (daysHeight * 5))
+        DaysRow0Container.Size = New Size(ClientSize.Width, daysHeight)
+        DaysRow0Container.Location = New Point(0, daysYStart)
+        DaysRow1Container.Size = New Size(ClientSize.Width, daysHeight)
+        DaysRow1Container.Location = New Point(0, daysYStart + (daysHeight))
+        DaysRow2Container.Size = New Size(ClientSize.Width, daysHeight)
+        DaysRow2Container.Location = New Point(0, daysYStart + (daysHeight * 2))
+        DaysRow3Container.Size = New Size(ClientSize.Width, daysHeight)
+        DaysRow3Container.Location = New Point(0, daysYStart + (daysHeight * 3))
+        DaysRow4Container.Size = New Size(ClientSize.Width, daysHeight)
+        DaysRow4Container.Location = New Point(0, daysYStart + (daysHeight * 4))
+        DaysRow5Container.Size = New Size(ClientSize.Width, daysHeight)
+        DaysRow5Container.Location = New Point(0, daysYStart + (daysHeight * 5))
 
-        ' Also size the TasksPanel properly
-        TasksPanel.Size = New Size(300, 300)
-        TasksPanel.Location = New Point((ClientSize.Width - TasksPanel.Width) / 2,
-                                       (ClientSize.Height - TasksPanel.Height) / 2)
     End Sub
 
     Private Sub CreateMonthYearLabel()
@@ -84,17 +81,22 @@ Public Class calendar
         MonthYearContainer.Controls.Add(label)
     End Sub
 
+
     Private Sub SizeMonthYearLabel()
+
         Dim x As Integer
         Dim y As Integer
         Dim label As Label
 
         If MonthYearContainer.Controls.Count > 0 Then
+
             label = MonthYearContainer.Controls.Find("LblMonthYear", False).First
             x = (MonthYearContainer.Width - label.Width) / 2
             y = (MonthYearContainer.Height - label.Height) / 2
             label.Location = New Point(x, y)
+
         End If
+
     End Sub
 
     Private Sub CreateDaysOfWeekLabels()
@@ -788,6 +790,7 @@ Public Class calendar
             My.Computer.Audio.PlaySystemSound(Media.SystemSounds.Exclamation)
         End Try
     End Sub
+
 
 #End Region
 End Class

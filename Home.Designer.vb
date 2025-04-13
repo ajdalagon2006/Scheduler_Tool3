@@ -47,7 +47,7 @@ Partial Class Home
         Me.Panelmenu.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panelmenu.Location = New System.Drawing.Point(0, 0)
         Me.Panelmenu.Name = "Panelmenu"
-        Me.Panelmenu.Size = New System.Drawing.Size(1083, 58)
+        Me.Panelmenu.Size = New System.Drawing.Size(915, 58)
         Me.Panelmenu.TabIndex = 0
         '
         'lbluser
@@ -109,16 +109,16 @@ Partial Class Home
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Left
         Me.Panel2.Location = New System.Drawing.Point(0, 58)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(201, 658)
+        Me.Panel2.Size = New System.Drawing.Size(158, 601)
         Me.Panel2.TabIndex = 1
         '
         'lblFormTitle
         '
         Me.lblFormTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblFormTitle.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
-        Me.lblFormTitle.Location = New System.Drawing.Point(27, 156)
+        Me.lblFormTitle.Location = New System.Drawing.Point(6, 142)
         Me.lblFormTitle.Name = "lblFormTitle"
-        Me.lblFormTitle.Size = New System.Drawing.Size(146, 54)
+        Me.lblFormTitle.Size = New System.Drawing.Size(146, 28)
         Me.lblFormTitle.TabIndex = 1
         Me.lblFormTitle.Text = "Home"
         Me.lblFormTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -130,10 +130,10 @@ Partial Class Home
         Me.homecurrenticon.IconChar = FontAwesome.Sharp.IconChar.HomeUser
         Me.homecurrenticon.IconColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
         Me.homecurrenticon.IconFont = FontAwesome.Sharp.IconFont.[Auto]
-        Me.homecurrenticon.IconSize = 181
-        Me.homecurrenticon.Location = New System.Drawing.Point(10, 0)
+        Me.homecurrenticon.IconSize = 158
+        Me.homecurrenticon.Location = New System.Drawing.Point(0, 0)
         Me.homecurrenticon.Name = "homecurrenticon"
-        Me.homecurrenticon.Size = New System.Drawing.Size(181, 197)
+        Me.homecurrenticon.Size = New System.Drawing.Size(158, 158)
         Me.homecurrenticon.TabIndex = 0
         Me.homecurrenticon.TabStop = False
         '
@@ -142,9 +142,9 @@ Partial Class Home
         Me.Paneldesktop.BackColor = System.Drawing.Color.FromArgb(CType(CType(54, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.Paneldesktop.Controls.Add(Me.Button1)
         Me.Paneldesktop.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Paneldesktop.Location = New System.Drawing.Point(201, 58)
+        Me.Paneldesktop.Location = New System.Drawing.Point(158, 58)
         Me.Paneldesktop.Name = "Paneldesktop"
-        Me.Paneldesktop.Size = New System.Drawing.Size(882, 658)
+        Me.Paneldesktop.Size = New System.Drawing.Size(757, 601)
         Me.Paneldesktop.TabIndex = 2
         '
         'Button1
@@ -165,7 +165,7 @@ Partial Class Home
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(1083, 716)
+        Me.ClientSize = New System.Drawing.Size(915, 659)
         Me.Controls.Add(Me.Paneldesktop)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panelmenu)
