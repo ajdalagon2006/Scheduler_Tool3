@@ -31,9 +31,8 @@ Public Class AlarmManager
         Dim currentDateTimeStr = currentDateTime.ToString("yyyy-MM-dd HH:mm")
 
         Try
-            Using connection As SQLiteConnection = DbConnection.GetConnection()
-                connection.Open()
-
+            ' Use GetSQLiteConnection instead of DbConnection.GetConnection
+            Using connection As SQLiteConnection = GetSQLiteConnection()
                 ' Find alarms that should trigger at the current time (within the minute)
                 Dim command As New SQLiteCommand(
                     "SELECT * FROM Tasks WHERE has_alarm = 1 AND " &
@@ -52,14 +51,20 @@ Public Class AlarmManager
                         TriggerAlarm(taskName, taskComment, soundFile)
                     End While
                 End Using
-
-                connection.Close()
             End Using
         Catch ex As Exception
             ' Log error but don't show message box as this runs in background
             Console.WriteLine("Error checking alarms: " & ex.Message)
         End Try
     End Sub
+
+    ' Add GetSQLiteConnection method directly in this class to avoid reference issues
+    Private Function GetSQLiteConnection() As SQLiteConnection
+        Dim connectionString As String = "Data Source=Appdatabase.db;Version=3;"
+        Dim connection As New SQLiteConnection(connectionString)
+        connection.Open()
+        Return connection
+    End Function
 
     Public Sub TriggerAlarm(taskName As String, taskComment As String, soundFile As String)
         ' Play the alarm sound in a separate thread

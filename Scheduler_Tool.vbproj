@@ -113,6 +113,7 @@
     <Compile Include="AlarmNotification.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="DbHelper.vb" />
     <Compile Include="HolidayManager.vb" />
     <Compile Include="Task.Designer.vb">
       <DependentUpon>Task.vb</DependentUpon>
@@ -127,7 +128,6 @@
     <Compile Include="calendar.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DatabaseInitializer.vb" />
     <Compile Include="forgot.Designer.vb">
       <DependentUpon>forgot.vb</DependentUpon>
     </Compile>
