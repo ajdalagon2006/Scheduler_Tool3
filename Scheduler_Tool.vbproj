@@ -206,12 +206,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="View.Designer.vb">
-      <DependentUpon>View.vb</DependentUpon>
-    </Compile>
-    <Compile Include="View.vb">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Task.resx">
@@ -240,9 +234,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Splash.resx">
       <DependentUpon>Splash.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="View.resx">
-      <DependentUpon>View.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

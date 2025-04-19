@@ -47,7 +47,7 @@ Partial Class Home
         Me.Panelmenu.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panelmenu.Location = New System.Drawing.Point(0, 0)
         Me.Panelmenu.Name = "Panelmenu"
-        Me.Panelmenu.Size = New System.Drawing.Size(915, 58)
+        Me.Panelmenu.Size = New System.Drawing.Size(1192, 58)
         Me.Panelmenu.TabIndex = 0
         '
         'lbluser
@@ -144,7 +144,7 @@ Partial Class Home
         Me.Paneldesktop.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Paneldesktop.Location = New System.Drawing.Point(158, 58)
         Me.Paneldesktop.Name = "Paneldesktop"
-        Me.Paneldesktop.Size = New System.Drawing.Size(757, 601)
+        Me.Paneldesktop.Size = New System.Drawing.Size(1034, 601)
         Me.Paneldesktop.TabIndex = 2
         '
         'Button1
@@ -165,7 +165,7 @@ Partial Class Home
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(915, 659)
+        Me.ClientSize = New System.Drawing.Size(1192, 659)
         Me.Controls.Add(Me.Paneldesktop)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panelmenu)

@@ -30,6 +30,7 @@ Partial Class Task
         Me.lblCustomSound = New System.Windows.Forms.Label()
         Me.btnBrowseSound = New System.Windows.Forms.Button()
         Me.txtSoundFile = New System.Windows.Forms.TextBox()
+        Me.timePicker = New System.Windows.Forms.DateTimePicker()
         Me.chkAlarm = New System.Windows.Forms.CheckBox()
         Me.pnlTimeSettings = New System.Windows.Forms.Panel()
         Me.chkAllDay = New System.Windows.Forms.CheckBox()
@@ -43,7 +44,6 @@ Partial Class Task
         Me.lblCategory = New System.Windows.Forms.Label()
         Me.comsecbox = New System.Windows.Forms.TextBox()
         Me.todobox = New System.Windows.Forms.TextBox()
-        Me.timePicker = New System.Windows.Forms.DateTimePicker()
         Me.pnlHeader.SuspendLayout()
         Me.pnlMain.SuspendLayout()
         Me.pnlAlarmSettings.SuspendLayout()
@@ -128,7 +128,7 @@ Partial Class Task
         Me.lblCustomSound.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblCustomSound.Location = New System.Drawing.Point(10, 50)
         Me.lblCustomSound.Name = "lblCustomSound"
-        Me.lblCustomSound.Size = New System.Drawing.Size(85, 15)
+        Me.lblCustomSound.Size = New System.Drawing.Size(89, 15)
         Me.lblCustomSound.TabIndex = 3
         Me.lblCustomSound.Text = "Custom Sound:"
         '
@@ -174,7 +174,7 @@ Partial Class Task
         Me.chkAlarm.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.chkAlarm.Location = New System.Drawing.Point(20, 260)
         Me.chkAlarm.Name = "chkAlarm"
-        Me.chkAlarm.Size = New System.Drawing.Size(104, 21)
+        Me.chkAlarm.Size = New System.Drawing.Size(101, 21)
         Me.chkAlarm.TabIndex = 4
         Me.chkAlarm.Text = "Set an Alarm"
         Me.chkAlarm.UseVisualStyleBackColor = True
@@ -200,7 +200,7 @@ Partial Class Task
         Me.chkAllDay.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.chkAllDay.Location = New System.Drawing.Point(380, 8)
         Me.chkAllDay.Name = "chkAllDay"
-        Me.chkAllDay.Size = New System.Drawing.Size(63, 19)
+        Me.chkAllDay.Size = New System.Drawing.Size(62, 19)
         Me.chkAllDay.TabIndex = 4
         Me.chkAllDay.Text = "All day"
         Me.chkAllDay.UseVisualStyleBackColor = True
@@ -265,7 +265,7 @@ Partial Class Task
         Me.s1.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.s1.Location = New System.Drawing.Point(213, 5)
         Me.s1.Name = "s1"
-        Me.s1.Size = New System.Drawing.Size(98, 19)
+        Me.s1.Size = New System.Drawing.Size(97, 19)
         Me.s1.TabIndex = 2
         Me.s1.Text = "School Works"
         Me.s1.UseVisualStyleBackColor = True
@@ -289,7 +289,7 @@ Partial Class Task
         Me.lblCategory.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblCategory.Location = New System.Drawing.Point(5, 7)
         Me.lblCategory.Name = "lblCategory"
-        Me.lblCategory.Size = New System.Drawing.Size(95, 15)
+        Me.lblCategory.Size = New System.Drawing.Size(92, 15)
         Me.lblCategory.TabIndex = 0
         Me.lblCategory.Text = "Select Category:"
         '
@@ -303,7 +303,7 @@ Partial Class Task
         Me.comsecbox.Name = "comsecbox"
         Me.comsecbox.Size = New System.Drawing.Size(460, 95)
         Me.comsecbox.TabIndex = 1
-        Me.comsecbox.Text = "Add a description or attach documents"
+        Me.comsecbox.Text = "Add a description " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         '
         'todobox
         '

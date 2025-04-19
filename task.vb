@@ -35,6 +35,16 @@ Public Class Task
         DataSaved = False
         date1.Value = SelectedDate
 
+        If Not IsEdit Then
+            date1.MinDate = DateTime.Now.Date
+
+            ' If the provided date is in the past, use today's date instead
+            If IsDateInPast(SelectedDate) Then
+                date1.Value = DateTime.Now.Date
+                SelectedDate = date1.Value
+            End If
+        End If
+
         ' Set time pickers based on current time
         Dim currentTime As DateTime = DateTime.Now
         Dim roundedHour As Integer = currentTime.Hour
@@ -254,6 +264,35 @@ Public Class Task
             MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             DataSaved = False
         End Try
+
+        ' Check for empty title
+        If String.IsNullOrWhiteSpace(todobox.Text) OrElse todobox.Text = "Add a title" Then
+            MessageBox.Show("Task name cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
+        End If
+
+        ' Only check the date if this is a new task (not editing an existing one)
+        If Not IsEdit AndAlso IsDateInPast(date1.Value) Then
+            MessageBox.Show("Cannot create tasks for past dates.", "Invalid Date", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+    End Sub
+
+    Private Function IsDateInPast(dateToCheck As DateTime) As Boolean
+        ' Compare only the date parts (ignoring time)
+        Return dateToCheck.Date < DateTime.Now.Date
+    End Function
+
+    Private Sub date1_ValueChanged(sender As Object, e As EventArgs) Handles date1.ValueChanged
+        ' Check if selected date is in the past
+        If IsDateInPast(date1.Value) Then
+            MessageBox.Show("Cannot create tasks for past dates. Please select today or a future date.",
+                       "Invalid Date", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+            ' Reset to current date
+            date1.Value = DateTime.Now.Date
+        End If
     End Sub
 
     Private Sub createbtn_Click(sender As Object, e As EventArgs) Handles btnSave.Click
