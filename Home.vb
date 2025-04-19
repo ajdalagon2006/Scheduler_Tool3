@@ -38,7 +38,7 @@ Public Class Home
 
     Private Function GetUsername() As String
         Dim username As String = String.Empty
-        Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
+        Dim conn As New SQLiteConnection("Data Source=E:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         Try
             conn.Open()
             Dim cmd As New SQLiteCommand("SELECT Username FROM Userdatabase WHERE ID = @id", conn)

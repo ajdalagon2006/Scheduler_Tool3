@@ -58,6 +58,13 @@ Public Class AlarmNotification
     End Sub
 
     Private Sub btnDismiss_Click(sender As Object, e As EventArgs) Handles btnDismiss.Click
+        ' Stop the alarm sound
+        Dim calendarForm As calendar = DirectCast(Application.OpenForms("calendar"), calendar)
+        If calendarForm IsNot Nothing Then
+            calendarForm.StopAlarmSound()
+        End If
+
+        ' Close the notification
         Me.Close()
     End Sub
 

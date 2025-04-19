@@ -31,11 +31,27 @@ Partial Class calendar
         Me.DaysRow0Container = New System.Windows.Forms.Panel()
         Me.DaysOfWeekContainer = New System.Windows.Forms.Panel()
         Me.MonthYearContainer = New System.Windows.Forms.Panel()
+        Me.lblCurrentMonth = New System.Windows.Forms.Label()
+        Me.btnNextMonth = New System.Windows.Forms.Button()
+        Me.btnPrevMonth = New System.Windows.Forms.Button()
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.EditEventToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TasksPanel = New System.Windows.Forms.Panel()
         Me.AlarmTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.chkShowUpcoming = New System.Windows.Forms.CheckBox()
+        Me.pnlCalendarControls = New System.Windows.Forms.Panel()
+        Me.cmbCategoryFilter = New System.Windows.Forms.ComboBox()
+        Me.lblCategoryFilter = New System.Windows.Forms.Label()
+        Me.chkShowHolidays = New System.Windows.Forms.CheckBox()
+        Me.statusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.lblStatus = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.lblUpcomingEvents = New System.Windows.Forms.Label()
+        Me.pnlUpcomingEvents = New System.Windows.Forms.Panel()
+        Me.MonthYearContainer.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
+        Me.pnlCalendarControls.SuspendLayout()
+        Me.statusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'DaysRow5Container
@@ -97,21 +113,65 @@ Partial Class calendar
         'MonthYearContainer
         '
         Me.MonthYearContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(253, Byte), Integer), CType(CType(223, Byte), Integer))
+        Me.MonthYearContainer.Controls.Add(Me.lblCurrentMonth)
+        Me.MonthYearContainer.Controls.Add(Me.btnNextMonth)
+        Me.MonthYearContainer.Controls.Add(Me.btnPrevMonth)
         Me.MonthYearContainer.Location = New System.Drawing.Point(21, 9)
         Me.MonthYearContainer.Name = "MonthYearContainer"
         Me.MonthYearContainer.Size = New System.Drawing.Size(757, 50)
         Me.MonthYearContainer.TabIndex = 7
         '
+        'lblCurrentMonth
+        '
+        Me.lblCurrentMonth.AutoSize = True
+        Me.lblCurrentMonth.Font = New System.Drawing.Font("Segoe UI", 18.0!, System.Drawing.FontStyle.Bold)
+        Me.lblCurrentMonth.Location = New System.Drawing.Point(307, 9)
+        Me.lblCurrentMonth.Name = "lblCurrentMonth"
+        Me.lblCurrentMonth.Size = New System.Drawing.Size(133, 32)
+        Me.lblCurrentMonth.TabIndex = 2
+        Me.lblCurrentMonth.Text = "April 2025"
+        Me.lblCurrentMonth.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'btnNextMonth
+        '
+        Me.btnNextMonth.FlatAppearance.BorderSize = 0
+        Me.btnNextMonth.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNextMonth.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold)
+        Me.btnNextMonth.Location = New System.Drawing.Point(710, 9)
+        Me.btnNextMonth.Name = "btnNextMonth"
+        Me.btnNextMonth.Size = New System.Drawing.Size(40, 32)
+        Me.btnNextMonth.TabIndex = 1
+        Me.btnNextMonth.Text = ">"
+        Me.btnNextMonth.UseVisualStyleBackColor = True
+        '
+        'btnPrevMonth
+        '
+        Me.btnPrevMonth.FlatAppearance.BorderSize = 0
+        Me.btnPrevMonth.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnPrevMonth.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold)
+        Me.btnPrevMonth.Location = New System.Drawing.Point(9, 9)
+        Me.btnPrevMonth.Name = "btnPrevMonth"
+        Me.btnPrevMonth.Size = New System.Drawing.Size(40, 32)
+        Me.btnPrevMonth.TabIndex = 0
+        Me.btnPrevMonth.Text = "<"
+        Me.btnPrevMonth.UseVisualStyleBackColor = True
+        '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteToolStripMenuItem})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EditEventToolStripMenuItem, Me.DeleteToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(108, 26)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(127, 48)
+        '
+        'EditEventToolStripMenuItem
+        '
+        Me.EditEventToolStripMenuItem.Name = "EditEventToolStripMenuItem"
+        Me.EditEventToolStripMenuItem.Size = New System.Drawing.Size(126, 22)
+        Me.EditEventToolStripMenuItem.Text = "Edit Event"
         '
         'DeleteToolStripMenuItem
         '
         Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
+        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(126, 22)
         Me.DeleteToolStripMenuItem.Text = "Delete"
         '
         'TasksPanel
@@ -128,11 +188,107 @@ Partial Class calendar
         '
         Me.AlarmTimer.Interval = 60000
         '
+        'chkShowUpcoming
+        '
+        Me.chkShowUpcoming.AutoSize = True
+        Me.chkShowUpcoming.Checked = True
+        Me.chkShowUpcoming.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowUpcoming.Location = New System.Drawing.Point(15, 12)
+        Me.chkShowUpcoming.Name = "chkShowUpcoming"
+        Me.chkShowUpcoming.Size = New System.Drawing.Size(159, 17)
+        Me.chkShowUpcoming.TabIndex = 16
+        Me.chkShowUpcoming.Text = "Show only upcoming events"
+        Me.chkShowUpcoming.UseVisualStyleBackColor = True
+        '
+        'pnlCalendarControls
+        '
+        Me.pnlCalendarControls.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pnlCalendarControls.Controls.Add(Me.cmbCategoryFilter)
+        Me.pnlCalendarControls.Controls.Add(Me.lblCategoryFilter)
+        Me.pnlCalendarControls.Controls.Add(Me.chkShowHolidays)
+        Me.pnlCalendarControls.Controls.Add(Me.chkShowUpcoming)
+        Me.pnlCalendarControls.Location = New System.Drawing.Point(795, 9)
+        Me.pnlCalendarControls.Name = "pnlCalendarControls"
+        Me.pnlCalendarControls.Size = New System.Drawing.Size(200, 100)
+        Me.pnlCalendarControls.TabIndex = 18
+        '
+        'cmbCategoryFilter
+        '
+        Me.cmbCategoryFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbCategoryFilter.FormattingEnabled = True
+        Me.cmbCategoryFilter.Items.AddRange(New Object() {"All Categories", "Personal", "Deadline", "Holiday", "Meeting", "Other"})
+        Me.cmbCategoryFilter.Location = New System.Drawing.Point(15, 71)
+        Me.cmbCategoryFilter.Name = "cmbCategoryFilter"
+        Me.cmbCategoryFilter.Size = New System.Drawing.Size(170, 21)
+        Me.cmbCategoryFilter.TabIndex = 19
+        '
+        'lblCategoryFilter
+        '
+        Me.lblCategoryFilter.AutoSize = True
+        Me.lblCategoryFilter.Location = New System.Drawing.Point(13, 55)
+        Me.lblCategoryFilter.Name = "lblCategoryFilter"
+        Me.lblCategoryFilter.Size = New System.Drawing.Size(87, 13)
+        Me.lblCategoryFilter.TabIndex = 18
+        Me.lblCategoryFilter.Text = "Filter by category"
+        '
+        'chkShowHolidays
+        '
+        Me.chkShowHolidays.AutoSize = True
+        Me.chkShowHolidays.Checked = True
+        Me.chkShowHolidays.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowHolidays.Location = New System.Drawing.Point(15, 35)
+        Me.chkShowHolidays.Name = "chkShowHolidays"
+        Me.chkShowHolidays.Size = New System.Drawing.Size(94, 17)
+        Me.chkShowHolidays.TabIndex = 17
+        Me.chkShowHolidays.Text = "Show holidays"
+        Me.chkShowHolidays.UseVisualStyleBackColor = True
+        '
+        'statusStrip1
+        '
+        Me.statusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblStatus})
+        Me.statusStrip1.Location = New System.Drawing.Point(0, 452)
+        Me.statusStrip1.Name = "statusStrip1"
+        Me.statusStrip1.Size = New System.Drawing.Size(1000, 22)
+        Me.statusStrip1.TabIndex = 19
+        Me.statusStrip1.Text = "statusStrip1"
+        '
+        'lblStatus
+        '
+        Me.lblStatus.Name = "lblStatus"
+        Me.lblStatus.Size = New System.Drawing.Size(39, 17)
+        Me.lblStatus.Text = "Ready"
+        '
+        'lblUpcomingEvents
+        '
+        Me.lblUpcomingEvents.AutoSize = True
+        Me.lblUpcomingEvents.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblUpcomingEvents.Location = New System.Drawing.Point(795, 112)
+        Me.lblUpcomingEvents.Name = "lblUpcomingEvents"
+        Me.lblUpcomingEvents.Size = New System.Drawing.Size(119, 17)
+        Me.lblUpcomingEvents.TabIndex = 20
+        Me.lblUpcomingEvents.Text = "Upcoming Events:"
+        '
+        'pnlUpcomingEvents
+        '
+        Me.pnlUpcomingEvents.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pnlUpcomingEvents.AutoScroll = True
+        Me.pnlUpcomingEvents.BackColor = System.Drawing.Color.White
+        Me.pnlUpcomingEvents.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pnlUpcomingEvents.Location = New System.Drawing.Point(795, 134)
+        Me.pnlUpcomingEvents.Name = "pnlUpcomingEvents"
+        Me.pnlUpcomingEvents.Size = New System.Drawing.Size(200, 307)
+        Me.pnlUpcomingEvents.TabIndex = 21
+        '
         'calendar
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.ClientSize = New System.Drawing.Size(1000, 474)
+        Me.Controls.Add(Me.pnlUpcomingEvents)
+        Me.Controls.Add(Me.lblUpcomingEvents)
+        Me.Controls.Add(Me.statusStrip1)
+        Me.Controls.Add(Me.pnlCalendarControls)
         Me.Controls.Add(Me.TasksPanel)
         Me.Controls.Add(Me.DaysRow5Container)
         Me.Controls.Add(Me.DaysRow4Container)
@@ -144,9 +300,16 @@ Partial Class calendar
         Me.Controls.Add(Me.MonthYearContainer)
         Me.Name = "calendar"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "calendar"
+        Me.Text = "Calendar Scheduler"
+        Me.MonthYearContainer.ResumeLayout(False)
+        Me.MonthYearContainer.PerformLayout()
         Me.ContextMenuStrip1.ResumeLayout(False)
+        Me.pnlCalendarControls.ResumeLayout(False)
+        Me.pnlCalendarControls.PerformLayout()
+        Me.statusStrip1.ResumeLayout(False)
+        Me.statusStrip1.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -162,4 +325,17 @@ Partial Class calendar
     Friend WithEvents DeleteToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents TasksPanel As Panel
     Friend WithEvents AlarmTimer As Timer
+    Friend WithEvents chkShowUpcoming As CheckBox
+    Friend WithEvents pnlCalendarControls As Panel
+    Friend WithEvents cmbCategoryFilter As ComboBox
+    Friend WithEvents lblCategoryFilter As Label
+    Friend WithEvents chkShowHolidays As CheckBox
+    Friend WithEvents statusStrip1 As StatusStrip
+    Friend WithEvents lblStatus As ToolStripStatusLabel
+    Friend WithEvents lblUpcomingEvents As Label
+    Friend WithEvents pnlUpcomingEvents As Panel
+    Friend WithEvents btnPrevMonth As Button
+    Friend WithEvents btnNextMonth As Button
+    Friend WithEvents lblCurrentMonth As Label
+    Friend WithEvents EditEventToolStripMenuItem As ToolStripMenuItem
 End Class

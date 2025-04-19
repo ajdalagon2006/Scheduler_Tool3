@@ -34,25 +34,89 @@ Public Class Task
     Private Sub Task_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         DataSaved = False
         date1.Value = SelectedDate
-        timePicker.Value = DateTime.Now
+
+        ' Set time pickers based on current time
+        Dim currentTime As DateTime = DateTime.Now
+        Dim roundedHour As Integer = currentTime.Hour
+        Dim roundedMinute As Integer = If(currentTime.Minute < 30, 0, 30)
+
+        ' Format the time string for the combobox
+        Dim timeFormat As String = If(roundedHour = 0, "12", If(roundedHour > 12, (roundedHour - 12).ToString(), roundedHour.ToString())) & ":" &
+                              If(roundedMinute = 0, "00", "30") & " " & If(roundedHour < 12, "AM", "PM")
+
+        ' Find and select the closest time in the combobox
+        For i As Integer = 0 To cmbStartTime.Items.Count - 1
+            If cmbStartTime.Items(i).ToString() = timeFormat Then
+                cmbStartTime.SelectedIndex = i
+                cmbEndTime.SelectedIndex = Math.Min(i + 2, cmbEndTime.Items.Count - 1) ' Default to 1 hour later
+                Exit For
+            End If
+        Next
+
+        ' Set timePicker for alarms
+        timePicker.Value = currentTime
 
         ' Disable alarm settings by default
-        grpAlarm.Enabled = False
+        pnlAlarmSettings.Enabled = False
 
         If IsEdit Then
-            Me.Text = "Edit"
+            Me.Text = "Edit Event"
             todobox.Text = OriginalNote
+            todobox.SelectAll()
 
             ' Load task data if editing
             LoadTaskData()
         Else
-            Me.Text = "Add"
-            todobox.Clear()
-            comsecbox.Clear()
+            Me.Text = "Add Event"
+            todobox.Text = "Add a title"
+            todobox.SelectAll()
+            comsecbox.Text = "Add a description or attach documents"
             e1.Checked = True ' Default to Event
         End If
     End Sub
 
+    Private Sub todobox_Enter(sender As Object, e As EventArgs) Handles todobox.Enter
+        If todobox.Text = "Add a title" Then
+            todobox.Text = ""
+        End If
+    End Sub
+
+    Private Sub todobox_Leave(sender As Object, e As EventArgs) Handles todobox.Leave
+        If String.IsNullOrWhiteSpace(todobox.Text) Then
+            todobox.Text = "Add a title"
+        End If
+    End Sub
+
+    Private Sub comsecbox_Enter(sender As Object, e As EventArgs) Handles comsecbox.Enter
+        If comsecbox.Text = "Add a description or attach documents" Then
+            comsecbox.Text = ""
+        End If
+    End Sub
+
+    Private Sub comsecbox_Leave(sender As Object, e As EventArgs) Handles comsecbox.Leave
+        If String.IsNullOrWhiteSpace(comsecbox.Text) Then
+            comsecbox.Text = "Add a description or attach documents"
+        End If
+    End Sub
+
+    ' Updated alarm checkbox handler:
+    Private Sub chkAlarm_CheckedChanged(sender As Object, e As EventArgs) Handles chkAlarm.CheckedChanged
+        ' Enable/disable alarm settings panel based on checkbox
+        pnlAlarmSettings.Enabled = chkAlarm.Checked
+    End Sub
+
+    ' Update the buttons:
+    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        SaveTask()
+        If DataSaved Then
+            Me.Close()
+        End If
+    End Sub
+
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        DataSaved = False
+        Me.Close()
+    End Sub
     Private Sub LoadTaskData()
         Try
             Using connection As SQLiteConnection = DbConnection.GetConnection()
@@ -94,7 +158,7 @@ Public Class Task
                         If hasAlarmColumn Then
                             Dim hasAlarm As Boolean = Convert.ToBoolean(reader("has_alarm"))
                             chkAlarm.Checked = hasAlarm
-                            grpAlarm.Enabled = hasAlarm
+                            pnlAlarmSettings.Enabled = hasAlarm
 
                             If hasAlarm And hasAlarmTimeColumn Then
                                 ' Load alarm time if available
@@ -120,7 +184,7 @@ Public Class Task
     End Sub
 
     Private Sub SaveTask()
-        If String.IsNullOrWhiteSpace(todobox.Text) Then
+        If String.IsNullOrWhiteSpace(todobox.Text) OrElse todobox.Text = "Add a title" Then
             MessageBox.Show("Task name cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Return
         End If
@@ -134,39 +198,45 @@ Public Class Task
 
                 If IsEdit Then
                     command = New SQLiteCommand(
-                        "UPDATE Task SET 
-                        todoname = @todoname, 
-                        Comment = @comment, 
-                        category = @category,
-                        has_alarm = @hasAlarm,
-                        alarm_time = @alarmTime,
-                        alarm_sound = @alarmSound
-                        WHERE todoname = @originalName AND Date = @date", connection)
+                    "UPDATE Task SET 
+                    todoname = @todoname, 
+                    Comment = @comment, 
+                    category = @category,
+                    has_alarm = @hasAlarm,
+                    alarm_time = @alarmTime,
+                    alarm_sound = @alarmSound
+                    WHERE todoname = @originalName AND Date = @date", connection)
 
                     command.Parameters.AddWithValue("@originalName", OriginalNote)
                 Else
                     command = New SQLiteCommand(
-                        "INSERT INTO Task 
-                        (todoname, Comment, Date, category, has_alarm, alarm_time, alarm_sound) 
-                        VALUES 
-                        (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
+                    "INSERT INTO Task 
+                    (todoname, Comment, Date, category, has_alarm, alarm_time, alarm_sound) 
+                    VALUES 
+                    (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
+                End If
+
+                ' Clean up comment text if it's the default placeholder
+                Dim commentText As String = comsecbox.Text
+                If commentText = "Add a description or attach documents" Then
+                    commentText = ""
                 End If
 
                 command.Parameters.AddWithValue("@todoname", todobox.Text)
-                command.Parameters.AddWithValue("@comment", comsecbox.Text)
-                command.Parameters.AddWithValue("@date", SelectedDate.ToString("yyyy-MM-dd"))
+                command.Parameters.AddWithValue("@comment", commentText)
+                command.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
                 command.Parameters.AddWithValue("@category", If(e1.Checked, "Event", "School Works"))
                 command.Parameters.AddWithValue("@hasAlarm", chkAlarm.Checked)
 
                 If chkAlarm.Checked Then
                     ' Combine the selected date with the time from timePicker
                     Dim alarmTime As New DateTime(
-                        SelectedDate.Year,
-                        SelectedDate.Month,
-                        SelectedDate.Day,
-                        timePicker.Value.Hour,
-                        timePicker.Value.Minute,
-                        0)
+                    date1.Value.Year,
+                    date1.Value.Month,
+                    date1.Value.Day,
+                    timePicker.Value.Hour,
+                    timePicker.Value.Minute,
+                    0)
 
                     command.Parameters.AddWithValue("@alarmTime", alarmTime.ToString("yyyy-MM-dd HH:mm:ss"))
                     command.Parameters.AddWithValue("@alarmSound", txtSoundFile.Text)
@@ -186,21 +256,16 @@ Public Class Task
         End Try
     End Sub
 
-    Private Sub createbtn_Click(sender As Object, e As EventArgs) Handles createbtn.Click
+    Private Sub createbtn_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         SaveTask()
         If DataSaved Then
             Me.Close()
         End If
     End Sub
 
-    Private Sub Cancelbtn_Click(sender As Object, e As EventArgs) Handles Cancelbtn.Click
+    Private Sub Cancelbtn_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
         DataSaved = False
         Me.Close()
-    End Sub
-
-    Private Sub chkAlarm_CheckedChanged(sender As Object, e As EventArgs) Handles chkAlarm.CheckedChanged
-        ' Enable/disable alarm settings group based on checkbox
-        grpAlarm.Enabled = chkAlarm.Checked
     End Sub
 
     Private Sub btnBrowseSound_Click(sender As Object, e As EventArgs) Handles btnBrowseSound.Click

@@ -65,6 +65,33 @@
 
     End Sub
 
+    ' Add these methods to the MonthlyCalendarInfo class
+    Public Function NextMonth() As MonthlyCalendarInfo
+        Dim newMonth As Integer = Month + 1
+        Dim newYear As Integer = Year
+
+        ' Handle December to January transition
+        If newMonth > 12 Then
+            newMonth = 1
+            newYear += 1
+        End If
+
+        Return New MonthlyCalendarInfo(newYear, newMonth)
+    End Function
+
+    Public Function PreviousMonth() As MonthlyCalendarInfo
+        Dim newMonth As Integer = Month - 1
+        Dim newYear As Integer = Year
+
+        ' Handle January to December transition
+        If newMonth < 1 Then
+            newMonth = 12
+            newYear -= 1
+        End If
+
+        Return New MonthlyCalendarInfo(newYear, newMonth)
+    End Function
+
     Public Sub GoToMonth(year As Integer, month As Integer)
 
         If year < 1 Or year > 9999 Then
