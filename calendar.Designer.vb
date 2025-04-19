@@ -138,6 +138,7 @@ Partial Class calendar
         Me.btnNextMonth.FlatAppearance.BorderSize = 0
         Me.btnNextMonth.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNextMonth.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold)
+        Me.btnNextMonth.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
         Me.btnNextMonth.Location = New System.Drawing.Point(710, 9)
         Me.btnNextMonth.Name = "btnNextMonth"
         Me.btnNextMonth.Size = New System.Drawing.Size(40, 32)
@@ -150,6 +151,7 @@ Partial Class calendar
         Me.btnPrevMonth.FlatAppearance.BorderSize = 0
         Me.btnPrevMonth.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPrevMonth.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold)
+        Me.btnPrevMonth.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
         Me.btnPrevMonth.Location = New System.Drawing.Point(9, 9)
         Me.btnPrevMonth.Name = "btnPrevMonth"
         Me.btnPrevMonth.Size = New System.Drawing.Size(40, 32)

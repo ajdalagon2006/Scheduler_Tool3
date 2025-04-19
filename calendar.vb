@@ -32,11 +32,11 @@ Public Class calendar
         NotesCategories = New List(Of String)
         Holidays = New Dictionary(Of DateTime, String)
 
-        ' Update database schema first - adds alarm fields and tags support
+        ' This is for databaseschema
         DbConnection.UpdateDatabaseSchema()
         DbConnection.UpdateDatabaseSchemaForTags()
 
-        ' Set up the UI
+        ' This is for the UI
         SizeContainers()
         CreateMonthYearLabel()
         SizeMonthYearLabel()
@@ -46,7 +46,7 @@ Public Class calendar
         SizeDaysControls()
         PopulateCalendarInfo()
 
-        ' Set default values for filters
+        ' default values for filters
         cmbCategoryFilter.SelectedIndex = 0 ' All Categories
         chkShowUpcoming.Checked = True
         chkShowHolidays.Checked = True
@@ -56,15 +56,15 @@ Public Class calendar
         LoadNotesFromDatabase()
         RefreshUpcomingEventsPanel()
 
-        ' Set up the alarm timer
+        ' For alarm timer
         AlarmTimer.Interval = 60000 ' Check every minute
         AlarmTimer.Start()
 
         ' Update status bar
         UpdateStatusBar("Calendar loaded successfully")
-        ' Setup auto-delete timer (runs every 5 minutes)
+        ' auto-delete timer 
 
-        TaskCleanupTimer.Interval = 300000 ' 5 minutes
+        TaskCleanupTimer.Interval = 300000
         TaskCleanupTimer.Enabled = True
 
         ' Run once at startup to clean existing completed tasks
@@ -82,13 +82,13 @@ Public Class calendar
 #Region "UI Layout Methods"
 
     Private Sub calendar_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
-        ' Resize all UI elements to fit the new window size
+        ' For window size
         SizeContainers()
         SizeMonthYearLabel()
         SizeDaysOfWeekLabels()
         SizeDaysControls()
 
-        ' Re-center the tasks panel if it's visible
+        ' UI responsive
         If TasksPanel.Visible Then
             TasksPanel.Location = New Point((ClientSize.Width - TasksPanel.Width) \ 2,
                                        (ClientSize.Height - TasksPanel.Height) \ 2)
@@ -96,7 +96,7 @@ Public Class calendar
     End Sub
 
     Private Sub SizeContainers()
-        ' Resize the form to accommodate the side panel for upcoming events
+        ' size 
         Me.Width = 1000
 
         Dim daysHeight As Integer
@@ -131,12 +131,12 @@ Public Class calendar
     End Sub
 
     Private Sub CreateMonthYearLabel()
-        ' Now handled by designer
+        ' for label
         lblCurrentMonth.Text = String.Format("{0} {1}", MonthName(CalendarInfo.Month), CalendarInfo.Year)
     End Sub
 
     Private Sub SizeMonthYearLabel()
-        ' Now handled by designer
+
     End Sub
 
     Private Sub CreateDaysOfWeekLabels()
@@ -147,6 +147,7 @@ Public Class calendar
         For i = 0 To 6
             label = New Label
             label.Name = String.Format("Lbl{0}", days(i))
+            label.BackColor = Color.FromArgb(219, 209, 236)
             label.Text = days(i)
             label.AutoSize = False
             label.Font = New Font("Segoe UI", 11, FontStyle.Regular)
@@ -223,7 +224,7 @@ Public Class calendar
     End Sub
 
     Private Sub PopulateCalendarInfo()
-        ' Update month-year display
+        ' month-year display
         lblCurrentMonth.Text = String.Format("{0} {1}", MonthName(CalendarInfo.Month), CalendarInfo.Year)
 
         For rowIndex = 0 To 5
@@ -289,12 +290,9 @@ Public Class calendar
                 Dim startDate = CalendarInfo.DateInYear(0, 0)
                 ' Last day in calendar
                 Dim endDate = CalendarInfo.DateInYear(5, 6)
-
-                ' [Rest of the method remains the same]
-
             End Using
 
-            ' Show the notes on calendar
+            ' notes on calendar
             ShowMonthNotes()
 
             ' Refresh the upcoming events panel
@@ -311,7 +309,7 @@ Public Class calendar
     Private Sub LoadHolidays()
         Try
             If Not ShowHolidaysFlag Then
-                ' Skip loading holidays if not showing them
+
                 Return
             End If
 
@@ -326,9 +324,6 @@ Public Class calendar
 
             ' Add default holidays
             AddDefaultHolidays()
-
-            ' Rest of method remains the same...
-
         Catch ex As Exception
             ' Table might not exist yet
             Console.WriteLine("Error loading holidays: " & ex.Message)
@@ -343,16 +338,6 @@ Public Class calendar
                 Dim checkCmd = New SQLiteCommand(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='Holidays'",
                 connection)
-
-                If checkCmd.ExecuteScalar() Is Nothing Then
-                    ' Create Holidays table if it doesn't exist
-                    Dim createCmd = New SQLiteCommand(
-                    "CREATE TABLE Holidays (id INTEGER PRIMARY KEY AUTOINCREMENT, " &
-                    "date TEXT, name TEXT, is_recurring INTEGER DEFAULT 0)",
-                    connection)
-                    createCmd.ExecuteNonQuery()
-                End If
-
                 ' Current year - force to 2025 as per user's specification
                 Dim currentYear As Integer = 2025
 
@@ -363,14 +348,14 @@ Public Class calendar
                 ' List of holidays - specifically including the user's requested holidays
                 Dim allHolidays As New List(Of Tuple(Of DateTime, String))()
 
-                ' April holidays - user requested these specific ones
+                ' April holidays 
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 16), "	The Day of Valor (Regular Holiday)"))
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 17), "	Maundy Thursday (Regular Holiday)"))
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 18), "Good Friday (Regular Holiday)"))
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 19), "Black Saturday (Special Non-working Holiday)"))
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 20), "Easter Sunday (Observance)"))
 
-                ' May holiday - user requested this specific one
+                ' May holiday 
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 5, 1), "Labor Day (Regular Holiday)"))
 
                 ' Other common holidays
@@ -381,7 +366,7 @@ Public Class calendar
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 12, 25), "Christmas Day"))
                 allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 12, 30), "Rizal Day"))
 
-                ' Insert holidays
+                ' Inserting the holidays
                 For Each holiday In allHolidays
                     Dim command As New SQLiteCommand(
                     "INSERT INTO Holidays (date, name, is_recurring) VALUES (@date, @name, 1)",
@@ -1451,4 +1436,3 @@ Public Class calendar
 #End Region
 
 End Class
-
