@@ -135,7 +135,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlarmManager.vb" />
+    <Compile Include="AlarmManager1.vb" />
     <Compile Include="AlarmNotification.Designer.vb">
       <DependentUpon>AlarmNotification.vb</DependentUpon>
     </Compile>

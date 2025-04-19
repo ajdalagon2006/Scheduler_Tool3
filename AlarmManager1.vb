@@ -1,14 +1,14 @@
 ﻿Imports System.Data.SQLite
 
-Public Class AlarmManager
-    Private Shared _instance As AlarmManager
+Public Class AlarmManager1
+    Private Shared _instance As AlarmManager1
     Private WithEvents checkTimer As New Timer()
     Private soundPlayer As System.Media.SoundPlayer
 
     ' Singleton pattern
-    Public Shared Function GetInstance() As AlarmManager
+    Public Shared Function GetInstance() As AlarmManager1
         If _instance Is Nothing Then
-            _instance = New AlarmManager()
+            _instance = New AlarmManager1()
         End If
         Return _instance
     End Function

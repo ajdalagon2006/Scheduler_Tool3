@@ -6,17 +6,6 @@ Public Class HolidayManager
         Try
             Using connection As SQLiteConnection = DbConnection.GetConnection()
                 connection.Open()
-
-                ' Create Holidays table if it doesn't exist
-                Dim createTableCmd As New SQLiteCommand(
-                    "CREATE TABLE IF NOT EXISTS Holidays (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        date TEXT NOT NULL,
-                        name TEXT NOT NULL,
-                        is_recurring INTEGER DEFAULT 0,
-                        color TEXT DEFAULT 'Red'
-                    )", connection)
-
                 createTableCmd.ExecuteNonQuery()
                 connection.Close()
             End Using

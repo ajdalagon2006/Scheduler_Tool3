@@ -1,7 +1,7 @@
 ﻿Imports System.Data.SQLite
 
 Public Class DbConnection
-    ' Make all methods Shared (static) so they can be called without creating an instance
+    ' Make all methods Shared 
     Public Shared Function GetSQLiteConnection() As SQLiteConnection
         Dim connectionString As String = "Data Source=Appdatabase.db;Version=3;"
         Dim connection As New SQLiteConnection(connectionString)
@@ -34,7 +34,7 @@ Public Class DbConnection
                     End While
                 End Using
 
-                ' Add columns if needed
+                ' Adding columns
                 If Not hasAlarmCol Then
                     Dim addAlarmCmd As New SQLiteCommand(
                         "ALTER TABLE Task ADD COLUMN has_alarm INTEGER DEFAULT 0", connection)
@@ -58,16 +58,12 @@ Public Class DbConnection
                     updateCmd.ExecuteNonQuery()
                 End If
 
-                ' Make sure Holidays table exists
+                ' Holidays table exists
                 Dim checkHolidaysCmd As New SQLiteCommand(
                     "SELECT name FROM sqlite_master WHERE type='table' AND name='Holidays'", connection)
 
                 If checkHolidaysCmd.ExecuteScalar() Is Nothing Then
-                    ' Create Holidays table
-                    Dim createHolidaysCmd As New SQLiteCommand(
-                        "CREATE TABLE Holidays (id INTEGER PRIMARY KEY AUTOINCREMENT, " &
-                        "date TEXT, name TEXT, is_recurring INTEGER DEFAULT 0)", connection)
-                    createHolidaysCmd.ExecuteNonQuery()
+
                 End If
             End Using
         Catch ex As Exception
@@ -100,16 +96,6 @@ Public Class DbConnection
                 Dim checkTaskTagsTableCmd = New SQLiteCommand(
                     "SELECT name FROM sqlite_master WHERE type='table' AND name='TaskTags'", connection)
 
-                If checkTaskTagsTableCmd.ExecuteScalar() Is Nothing Then
-                    ' Create TaskTags table for many-to-many relationship
-                    Dim createTaskTagsTableCmd = New SQLiteCommand(
-                        "CREATE TABLE TaskTags (task_id INTEGER, tag_id INTEGER, " &
-                        "PRIMARY KEY (task_id, tag_id), " &
-                        "FOREIGN KEY (task_id) REFERENCES Task(id) ON DELETE CASCADE, " &
-                        "FOREIGN KEY (tag_id) REFERENCES Tags(id))",
-                        connection)
-                    createTaskTagsTableCmd.ExecuteNonQuery()
-                End If
             End Using
         Catch ex As Exception
             Console.WriteLine("Error updating database schema for tags: " & ex.Message)

@@ -194,36 +194,56 @@ Public Class Task
     End Sub
 
     Private Sub SaveTask()
+        ' Check for empty title
         If String.IsNullOrWhiteSpace(todobox.Text) OrElse todobox.Text = "Add a title" Then
             MessageBox.Show("Task name cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Return
         End If
 
-        Try
-            ' Make sure schema is updated before saving
-            DbConnection.UpdateDatabaseSchema()
+        ' Only check the date if this is a new task (not editing an existing one)
+        If Not IsEdit AndAlso IsDateInPast(date1.Value) Then
+            MessageBox.Show("Cannot create tasks for past dates.", "Invalid Date", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
 
+        Try
             Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
+                ' Check if task with same name already exists for this date (for new tasks or renamed tasks)
+                If Not IsEdit OrElse (todobox.Text <> OriginalNote) Then
+                    Dim checkCmd As New SQLiteCommand(
+                    "SELECT COUNT(*) FROM Task WHERE todoname = @name AND Date = @date", connection)
+                    checkCmd.Parameters.AddWithValue("@name", todobox.Text)
+                    checkCmd.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
+
+                    Dim count As Integer = Convert.ToInt32(checkCmd.ExecuteScalar())
+                    If count > 0 Then
+                        MessageBox.Show("A task with this name already exists for this date. Please use a different name or date.",
+                               "Duplicate Task", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return
+                    End If
+                End If
+
+                ' Continue with existing save logic
                 Dim command As SQLiteCommand
 
                 If IsEdit Then
                     command = New SQLiteCommand(
-                    "UPDATE Task SET 
-                    todoname = @todoname, 
-                    Comment = @comment, 
-                    category = @category,
-                    has_alarm = @hasAlarm,
-                    alarm_time = @alarmTime,
-                    alarm_sound = @alarmSound
-                    WHERE todoname = @originalName AND Date = @date", connection)
+                "UPDATE Task SET 
+                todoname = @todoname, 
+                Comment = @comment, 
+                category = @category,
+                has_alarm = @hasAlarm,
+                alarm_time = @alarmTime,
+                alarm_sound = @alarmSound
+                WHERE todoname = @originalName AND Date = @date", connection)
 
                     command.Parameters.AddWithValue("@originalName", OriginalNote)
                 Else
                     command = New SQLiteCommand(
-                    "INSERT INTO Task 
-                    (todoname, Comment, Date, category, has_alarm, alarm_time, alarm_sound) 
-                    VALUES 
-                    (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
+                "INSERT INTO Task 
+                (todoname, Comment, Date, category, has_alarm, alarm_time, alarm_sound) 
+                VALUES 
+                (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
                 End If
 
                 ' Clean up comment text if it's the default placeholder
@@ -241,12 +261,12 @@ Public Class Task
                 If chkAlarm.Checked Then
                     ' Combine the selected date with the time from timePicker
                     Dim alarmTime As New DateTime(
-                    date1.Value.Year,
-                    date1.Value.Month,
-                    date1.Value.Day,
-                    timePicker.Value.Hour,
-                    timePicker.Value.Minute,
-                    0)
+                date1.Value.Year,
+                date1.Value.Month,
+                date1.Value.Day,
+                timePicker.Value.Hour,
+                timePicker.Value.Minute,
+                0)
 
                     command.Parameters.AddWithValue("@alarmTime", alarmTime.ToString("yyyy-MM-dd HH:mm:ss"))
                     command.Parameters.AddWithValue("@alarmSound", txtSoundFile.Text)
@@ -264,19 +284,6 @@ Public Class Task
             MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             DataSaved = False
         End Try
-
-        ' Check for empty title
-        If String.IsNullOrWhiteSpace(todobox.Text) OrElse todobox.Text = "Add a title" Then
-            MessageBox.Show("Task name cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return
-        End If
-
-        ' Only check the date if this is a new task (not editing an existing one)
-        If Not IsEdit AndAlso IsDateInPast(date1.Value) Then
-            MessageBox.Show("Cannot create tasks for past dates.", "Invalid Date", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-
     End Sub
 
     Private Function IsDateInPast(dateToCheck As DateTime) As Boolean
