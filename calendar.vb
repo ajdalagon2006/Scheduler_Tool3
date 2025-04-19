@@ -234,9 +234,9 @@ Public Class calendar
                 label.Text = CalendarInfo.DayInMonth(rowIndex, colIndex)
 
                 If CalendarInfo.IsActiveMonth(rowIndex, colIndex) Then
-                    label.ForeColor = Color.Black
+                    label.ForeColor = Color.FromArgb(219, 209, 236)
                 Else
-                    label.ForeColor = Color.Gray
+                    label.ForeColor = Color.FromArgb(150, 150, 170)
                 End If
 
                 If CalendarInfo.IsToday(rowIndex, colIndex) Then
@@ -590,18 +590,18 @@ Public Class calendar
                     Dim category As String = NotesCategories(noteIndex)
                     Select Case category.ToLower()
                         Case "personal"
-                            label.BackColor = Color.LightBlue
+                            label.BackColor = Color.FromArgb(120, 100, 160)  ' Purple accent
                         Case "deadline"
-                            label.BackColor = Color.LightCoral
+                            label.BackColor = Color.FromArgb(160, 100, 120)  ' Reddish-purple accent
                         Case "holiday"
-                            label.BackColor = Color.LightYellow
+                            label.BackColor = Color.FromArgb(100, 100, 140)  ' Muted blue-purple
                         Case "meeting"
-                            label.BackColor = Color.LightGreen
+                            label.BackColor = Color.FromArgb(100, 120, 160)  ' Muted blue
                         Case Else
-                            label.BackColor = Color.LightGray
+                            label.BackColor = Color.FromArgb(110, 110, 130)  ' Neutral gray-purple
                     End Select
 
-                    label.ForeColor = Color.Black
+                    label.ForeColor = Color.FromArgb(219, 209, 236)
                     label.Font = New Font("Segoe UI", 8, FontStyle.Regular)
                     label.ContextMenuStrip = ContextMenuStrip1 'assign context menu
                     label.Width = panel.Width
@@ -677,20 +677,20 @@ Public Class calendar
                     For Each ctrl As Control In panel.Controls
                         If TypeOf ctrl Is Label AndAlso ctrl.Name.StartsWith("LblDayOfMonth") Then
                             Dim dayLabel As Label = DirectCast(ctrl, Label)
-                            dayLabel.ForeColor = Color.Red
+                            dayLabel.ForeColor = Color.FromArgb(219, 209, 236)
                             dayLabel.Font = New Font("Segoe UI", 9, FontStyle.Bold)
                             Exit For
                         End If
                     Next
 
                     ' Change the panel background color for holidays
-                    panel.BackColor = Color.FromArgb(255, 235, 235)  ' Light red background
+                    panel.BackColor = System.Drawing.Color.FromArgb(80, 60, 80)  ' Purplish dark background for holidays
 
                     ' Create a holiday label at the bottom
                     Dim holidayLabel As New Label()
                     holidayLabel.Name = String.Format("LblHolidayText{0}{1}", row, col)
                     holidayLabel.Text = "HOLIDAY"
-                    holidayLabel.ForeColor = Color.Red
+                    holidayLabel.ForeColor = Color.FromArgb(219, 209, 236)
                     holidayLabel.BackColor = Color.Transparent
                     holidayLabel.Font = New Font("Segoe UI", 7, FontStyle.Bold)
                     holidayLabel.Size = New Size(panel.Width, 15)
@@ -702,7 +702,7 @@ Public Class calendar
                     Dim indicatorLabel As New Label()
                     indicatorLabel.Name = String.Format("LblHoliday{0}{1}", row, col)
                     indicatorLabel.Text = "🎉" ' Holiday emoji
-                    indicatorLabel.ForeColor = Color.Red
+                    indicatorLabel.ForeColor = Color.White
                     indicatorLabel.Font = New Font("Segoe UI", 12, FontStyle.Bold)
                     indicatorLabel.Size = New Size(25, 25)
                     indicatorLabel.Location = New Point(panel.Width - 27, 2)
@@ -788,7 +788,7 @@ Public Class calendar
         If Holidays.ContainsKey(selectedDate) Then
             Dim holidayLabel As New Label()
             holidayLabel.Text = "Holiday: " & Holidays(selectedDate)
-            holidayLabel.ForeColor = Color.Red
+            holidayLabel.ForeColor = Color.FromArgb(219, 209, 236)
             holidayLabel.Font = New Font("Segoe UI", 10, FontStyle.Italic)
             holidayLabel.AutoSize = True
             holidayLabel.Location = New Point(10, 40)

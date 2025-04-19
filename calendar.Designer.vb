@@ -56,7 +56,7 @@ Partial Class calendar
         '
         'DaysRow5Container
         '
-        Me.DaysRow5Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(53, Byte), Integer), CType(CType(97, Byte), Integer), CType(CType(202, Byte), Integer))
+        Me.DaysRow5Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(95, Byte), Integer), CType(CType(96, Byte), Integer), CType(CType(117, Byte), Integer))
         Me.DaysRow5Container.Location = New System.Drawing.Point(22, 391)
         Me.DaysRow5Container.Name = "DaysRow5Container"
         Me.DaysRow5Container.Size = New System.Drawing.Size(757, 50)
@@ -64,7 +64,7 @@ Partial Class calendar
         '
         'DaysRow4Container
         '
-        Me.DaysRow4Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(49, Byte), Integer), CType(CType(200, Byte), Integer), CType(CType(201, Byte), Integer))
+        Me.DaysRow4Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(90, Byte), Integer), CType(CType(91, Byte), Integer), CType(CType(111, Byte), Integer))
         Me.DaysRow4Container.Location = New System.Drawing.Point(22, 334)
         Me.DaysRow4Container.Name = "DaysRow4Container"
         Me.DaysRow4Container.Size = New System.Drawing.Size(757, 50)
@@ -72,7 +72,7 @@ Partial Class calendar
         '
         'DaysRow3Container
         '
-        Me.DaysRow3Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(140, Byte), Integer), CType(CType(181, Byte), Integer), CType(CType(139, Byte), Integer))
+        Me.DaysRow3Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(85, Byte), Integer), CType(CType(86, Byte), Integer), CType(CType(105, Byte), Integer))
         Me.DaysRow3Container.Location = New System.Drawing.Point(21, 277)
         Me.DaysRow3Container.Name = "DaysRow3Container"
         Me.DaysRow3Container.Size = New System.Drawing.Size(757, 50)
@@ -80,7 +80,7 @@ Partial Class calendar
         '
         'DaysRow2Container
         '
-        Me.DaysRow2Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(119, Byte), Integer), CType(CType(228, Byte), Integer), CType(CType(1, Byte), Integer))
+        Me.DaysRow2Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(80, Byte), Integer), CType(CType(81, Byte), Integer), CType(CType(99, Byte), Integer))
         Me.DaysRow2Container.Location = New System.Drawing.Point(21, 220)
         Me.DaysRow2Container.Name = "DaysRow2Container"
         Me.DaysRow2Container.Size = New System.Drawing.Size(757, 50)
@@ -88,7 +88,7 @@ Partial Class calendar
         '
         'DaysRow1Container
         '
-        Me.DaysRow1Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(153, Byte), Integer), CType(CType(191, Byte), Integer), CType(CType(50, Byte), Integer))
+        Me.DaysRow1Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(75, Byte), Integer), CType(CType(76, Byte), Integer), CType(CType(93, Byte), Integer))
         Me.DaysRow1Container.Location = New System.Drawing.Point(21, 163)
         Me.DaysRow1Container.Name = "DaysRow1Container"
         Me.DaysRow1Container.Size = New System.Drawing.Size(757, 50)
@@ -96,7 +96,7 @@ Partial Class calendar
         '
         'DaysRow0Container
         '
-        Me.DaysRow0Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(104, Byte), Integer), CType(CType(132, Byte), Integer), CType(CType(35, Byte), Integer))
+        Me.DaysRow0Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(70, Byte), Integer), CType(CType(71, Byte), Integer), CType(CType(87, Byte), Integer))
         Me.DaysRow0Container.Location = New System.Drawing.Point(22, 106)
         Me.DaysRow0Container.Name = "DaysRow0Container"
         Me.DaysRow0Container.Size = New System.Drawing.Size(757, 50)
@@ -104,7 +104,7 @@ Partial Class calendar
         '
         'DaysOfWeekContainer
         '
-        Me.DaysOfWeekContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(246, Byte), Integer), CType(CType(243, Byte), Integer), CType(CType(220, Byte), Integer))
+        Me.DaysOfWeekContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(60, Byte), Integer), CType(CType(61, Byte), Integer), CType(CType(74, Byte), Integer))
         Me.DaysOfWeekContainer.Location = New System.Drawing.Point(22, 66)
         Me.DaysOfWeekContainer.Name = "DaysOfWeekContainer"
         Me.DaysOfWeekContainer.Size = New System.Drawing.Size(757, 30)
@@ -112,7 +112,7 @@ Partial Class calendar
         '
         'MonthYearContainer
         '
-        Me.MonthYearContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(253, Byte), Integer), CType(CType(223, Byte), Integer))
+        Me.MonthYearContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(50, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(61, Byte), Integer))
         Me.MonthYearContainer.Controls.Add(Me.lblCurrentMonth)
         Me.MonthYearContainer.Controls.Add(Me.btnNextMonth)
         Me.MonthYearContainer.Controls.Add(Me.btnPrevMonth)
@@ -125,6 +125,7 @@ Partial Class calendar
         '
         Me.lblCurrentMonth.AutoSize = True
         Me.lblCurrentMonth.Font = New System.Drawing.Font("Segoe UI", 18.0!, System.Drawing.FontStyle.Bold)
+        Me.lblCurrentMonth.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
         Me.lblCurrentMonth.Location = New System.Drawing.Point(307, 9)
         Me.lblCurrentMonth.Name = "lblCurrentMonth"
         Me.lblCurrentMonth.Size = New System.Drawing.Size(133, 32)
@@ -176,7 +177,7 @@ Partial Class calendar
         '
         'TasksPanel
         '
-        Me.TasksPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(246, Byte), Integer), CType(CType(243, Byte), Integer), CType(CType(220, Byte), Integer))
+        Me.TasksPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(50, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(61, Byte), Integer))
         Me.TasksPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TasksPanel.Location = New System.Drawing.Point(250, 75)
         Me.TasksPanel.Name = "TasksPanel"
