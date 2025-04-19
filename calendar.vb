@@ -341,34 +341,51 @@ Public Class calendar
             Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
                 ' Check if Holidays table exists
                 Dim checkCmd = New SQLiteCommand(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name='Holidays'",
-                    connection)
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='Holidays'",
+                connection)
 
                 If checkCmd.ExecuteScalar() Is Nothing Then
                     ' Create Holidays table if it doesn't exist
                     Dim createCmd = New SQLiteCommand(
-                        "CREATE TABLE Holidays (id INTEGER PRIMARY KEY AUTOINCREMENT, " &
-                        "date TEXT, name TEXT, is_recurring INTEGER DEFAULT 0)",
-                        connection)
+                    "CREATE TABLE Holidays (id INTEGER PRIMARY KEY AUTOINCREMENT, " &
+                    "date TEXT, name TEXT, is_recurring INTEGER DEFAULT 0)",
+                    connection)
                     createCmd.ExecuteNonQuery()
                 End If
 
-                ' Current year
-                Dim currentYear As Integer = CalendarInfo.Year
+                ' Current year - force to 2025 as per user's specification
+                Dim currentYear As Integer = 2025
 
-                ' List of default holidays
-                Dim defaultHolidays As New List(Of Tuple(Of DateTime, String))()
-                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 1, 1), "New Year's Day"))
-                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 5, 1), "Labor Day"))
-                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 6, 12), "Independence Day"))
-                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 12, 25), "Christmas Day"))
-                defaultHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(currentYear, 12, 30), "Rizal Day"))
+                ' Clear existing holidays for clean reload
+                Dim clearCmd = New SQLiteCommand("DELETE FROM Holidays", connection)
+                clearCmd.ExecuteNonQuery()
 
-                ' Insert holidays if they don't exist
-                For Each holiday In defaultHolidays
+                ' List of holidays - specifically including the user's requested holidays
+                Dim allHolidays As New List(Of Tuple(Of DateTime, String))()
+
+                ' April holidays - user requested these specific ones
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 16), "	The Day of Valor (Regular Holiday)"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 17), "	Maundy Thursday (Regular Holiday)"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 18), "Good Friday (Regular Holiday)"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 19), "Black Saturday (Special Non-working Holiday)"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 4, 20), "Easter Sunday (Observance)"))
+
+                ' May holiday - user requested this specific one
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 5, 1), "Labor Day (Regular Holiday)"))
+
+                ' Other common holidays
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 1, 1), "New Year's Day"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 6, 12), "Independence Day"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 8, 30), "National Heroes Day"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 11, 1), "All Saints' Day"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 12, 25), "Christmas Day"))
+                allHolidays.Add(New Tuple(Of DateTime, String)(New DateTime(2025, 12, 30), "Rizal Day"))
+
+                ' Insert holidays
+                For Each holiday In allHolidays
                     Dim command As New SQLiteCommand(
-                        "INSERT OR IGNORE INTO Holidays (date, name, is_recurring) VALUES (@date, @name, 1)",
-                        connection)
+                    "INSERT INTO Holidays (date, name, is_recurring) VALUES (@date, @name, 1)",
+                    connection)
 
                     command.Parameters.AddWithValue("@date", holiday.Item1.ToString("yyyy-MM-dd"))
                     command.Parameters.AddWithValue("@name", holiday.Item2)
@@ -377,6 +394,12 @@ Public Class calendar
                     ' Add to in-memory collection
                     Holidays(holiday.Item1) = holiday.Item2
                 Next
+
+                ' Force refresh holiday display
+                HighlightHolidays()
+
+                ' Log success
+                Console.WriteLine($"Successfully added {allHolidays.Count} holidays to calendar")
             End Using
         Catch ex As Exception
             Console.WriteLine("Error adding default holidays: " & ex.Message)
@@ -509,6 +532,29 @@ Public Class calendar
         End Try
     End Sub
 
+    Private Sub AddCustomHoliday(holidayDate As DateTime, holidayName As String)
+        Try
+            Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
+                Dim command As New SQLiteCommand(
+                "INSERT OR REPLACE INTO Holidays (date, name, is_recurring) VALUES (@date, @name, 1)",
+                connection)
+
+                command.Parameters.AddWithValue("@date", holidayDate.ToString("yyyy-MM-dd"))
+                command.Parameters.AddWithValue("@name", holidayName)
+                command.ExecuteNonQuery()
+
+                ' Also add to in-memory collection for immediate display
+                Holidays(holidayDate) = holidayName
+
+                ' Refresh the calendar display
+                HighlightHolidays()
+            End Using
+        Catch ex As Exception
+            MessageBox.Show($"Error adding holiday: {ex.Message}", "Error",
+                      MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
 #End Region
 
 #Region "Display Methods"
@@ -627,8 +673,30 @@ Public Class calendar
                 Dim panel As Panel = Controls.Find(panelName, True).FirstOrDefault()
 
                 If panel IsNot Nothing Then
+                    ' Make the day number red and bold
+                    For Each ctrl As Control In panel.Controls
+                        If TypeOf ctrl Is Label AndAlso ctrl.Name.StartsWith("LblDayOfMonth") Then
+                            Dim dayLabel As Label = DirectCast(ctrl, Label)
+                            dayLabel.ForeColor = Color.Red
+                            dayLabel.Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                            Exit For
+                        End If
+                    Next
+
                     ' Change the panel background color for holidays
-                    panel.BackColor = Color.FromArgb(255, 240, 230)
+                    panel.BackColor = Color.FromArgb(255, 235, 235)  ' Light red background
+
+                    ' Create a holiday label at the bottom
+                    Dim holidayLabel As New Label()
+                    holidayLabel.Name = String.Format("LblHolidayText{0}{1}", row, col)
+                    holidayLabel.Text = "HOLIDAY"
+                    holidayLabel.ForeColor = Color.Red
+                    holidayLabel.BackColor = Color.Transparent
+                    holidayLabel.Font = New Font("Segoe UI", 7, FontStyle.Bold)
+                    holidayLabel.Size = New Size(panel.Width, 15)
+                    holidayLabel.Location = New Point(0, panel.Height - 15)
+                    holidayLabel.TextAlign = ContentAlignment.MiddleCenter
+                    panel.Controls.Add(holidayLabel)
 
                     ' Create a holiday indicator
                     Dim indicatorLabel As New Label()
@@ -637,12 +705,13 @@ Public Class calendar
                     indicatorLabel.ForeColor = Color.Red
                     indicatorLabel.Font = New Font("Segoe UI", 12, FontStyle.Bold)
                     indicatorLabel.Size = New Size(25, 25)
-                    indicatorLabel.Location = New Point(panel.Width - 30, 2)
+                    indicatorLabel.Location = New Point(panel.Width - 27, 2)
                     indicatorLabel.TextAlign = ContentAlignment.MiddleCenter
 
                     ' Add tooltip for holiday name
                     Dim toolTip As New ToolTip()
                     toolTip.SetToolTip(indicatorLabel, holidayName)
+                    toolTip.SetToolTip(holidayLabel, holidayName)
 
                     panel.Controls.Add(indicatorLabel)
                 End If

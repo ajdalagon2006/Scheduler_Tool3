@@ -38,7 +38,7 @@ Public Class Home
 
     Private Function GetUsername() As String
         Dim username As String = String.Empty
-        Dim conn As New SQLiteConnection("Data Source=E:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
+        Dim conn As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
         Try
             conn.Open()
             Dim cmd As New SQLiteCommand("SELECT Username FROM Userdatabase WHERE ID = @id", conn)
@@ -500,7 +500,7 @@ Public Class Home
     End Sub
 
     ' Quick task add button (replacing original Button1 functionality)
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(sender As Object, e As EventArgs)
         Dim addEditForm As New Task(DateTime.Now)
         addEditForm.ShowDialog()
 
@@ -534,10 +534,6 @@ Public Class Home
         lblFormTitle.Text = "Calendar View"
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Dim addEditForm As New Task(DateTime.Now) ' Pass the current date or any specific date
-        addEditForm.Show()
-    End Sub
 
 
 End Class

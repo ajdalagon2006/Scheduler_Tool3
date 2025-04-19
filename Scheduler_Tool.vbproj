@@ -144,7 +144,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DbConnection.vb" />
-    <Compile Include="HolidayManager.vb" />
     <Compile Include="Task.Designer.vb">
       <DependentUpon>Task.vb</DependentUpon>
     </Compile>
