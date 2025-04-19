@@ -30,11 +30,36 @@ Public Class forgot
             Using connection As New SQLiteConnection("Data Source=D:\Scheduler_Tool\bin\Debug\Appdatabase.db;Version=3;")
                 connection.Open()
 
-                ' Check if username exists and birthday matches
-                ' Note: assuming birthday is stored as MM/DD/YYYY
-                Dim command As New SQLiteCommand("SELECT ID FROM Userdatabase WHERE Username = @username AND Birthday = @birthday", connection)
+                Dim enteredDate As DateTime
+                Dim dateFormatted As String = ""
+
+                ' Try to parse the date in multiple formats
+                If DateTime.TryParseExact(codebox.Text.Trim(), "MM/dd/yyyy",
+                                     System.Globalization.CultureInfo.InvariantCulture,
+                                     System.Globalization.DateTimeStyles.None, enteredDate) Then
+                    ' Format succeeded - MM/DD/YYYY
+                    dateFormatted = enteredDate.ToString("yyyy-MM-dd")
+                ElseIf DateTime.TryParseExact(codebox.Text.Trim(), "yyyy-MM-dd",
+                                         System.Globalization.CultureInfo.InvariantCulture,
+                                         System.Globalization.DateTimeStyles.None, enteredDate) Then
+                    ' Format succeeded - YYYY-MM-DD
+                    dateFormatted = enteredDate.ToString("yyyy-MM-dd")
+                ElseIf DateTime.TryParse(codebox.Text.Trim(), enteredDate) Then
+                    ' Generic parsing attempt
+                    dateFormatted = enteredDate.ToString("yyyy-MM-dd")
+                Else
+                    MessageBox.Show("Please enter the birthday in MM/DD/YYYY format (e.g. 05/01/2007)",
+                               "Invalid Format", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return False
+                End If
+
+                ' Use SQL to compare only the date part (ignore time)
+                Dim command As New SQLiteCommand(
+                "SELECT ID FROM Userdatabase WHERE Username = @username AND date(Birthday) = @date",
+                connection)
+
                 command.Parameters.AddWithValue("@username", emailbox.Text.Trim())
-                command.Parameters.AddWithValue("@birthday", codebox.Text.Trim())
+                command.Parameters.AddWithValue("@date", dateFormatted)
 
                 Dim result As Object = command.ExecuteScalar()
 
@@ -42,12 +67,14 @@ Public Class forgot
                     ' User found with matching username and birthday
                     Return True
                 Else
-                    MessageBox.Show("Invalid username or birthday. Please try again.", "Verification Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show("Invalid username or birthday. Please try again.",
+                               "Verification Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     Return False
                 End If
             End Using
         Catch ex As Exception
-            MessageBox.Show("Database error: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Database error: " & ex.Message, "Error",
+                       MessageBoxButtons.OK, MessageBoxIcon.Error)
             Return False
         End Try
     End Function

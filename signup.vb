@@ -37,7 +37,7 @@ Public Class signup
         Dim cmd As New SQLiteCommand("INSERT INTO Userdatabase (Username, Password, Birthday, Gender, LoggedIn) VALUES (@Username, @Password, @Birthday, @Gender, 0)", conn)
         cmd.Parameters.AddWithValue("@Username", userbox.Text)
         cmd.Parameters.AddWithValue("@Password", passbox.Text)
-        cmd.Parameters.AddWithValue("@Birthday", bday.Value)
+        cmd.Parameters.AddWithValue("@Birthday", bday.Value.Date)
         Dim gender_v As Boolean
         If m1.Checked = True Then
             gender_v = 1 'Male
