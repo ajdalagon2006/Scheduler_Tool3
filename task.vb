@@ -313,17 +313,7 @@ Public Class Task
         End If
     End Sub
 
-    Private Sub createbtn_Click(sender As Object, e As EventArgs) Handles btnSave.Click
-        SaveTask()
-        If DataSaved Then
-            Me.Close()
-        End If
-    End Sub
 
-    Private Sub Cancelbtn_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
-        DataSaved = False
-        Me.Close()
-    End Sub
 
     Private Sub btnBrowseSound_Click(sender As Object, e As EventArgs) Handles btnBrowseSound.Click
         If openSoundDialog.ShowDialog() = DialogResult.OK Then

@@ -26,7 +26,6 @@ Partial Class AlarmNotification
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AlarmNotification))
         Me.panelHeader = New System.Windows.Forms.Panel()
         Me.lblTitle = New System.Windows.Forms.Label()
-        Me.btnClose = New System.Windows.Forms.Button()
         Me.panelBody = New System.Windows.Forms.Panel()
         Me.lblTaskName = New System.Windows.Forms.Label()
         Me.btnSnooze = New System.Windows.Forms.Button()
@@ -41,7 +40,6 @@ Partial Class AlarmNotification
         '
         Me.panelHeader.BackColor = System.Drawing.Color.FromArgb(CType(CType(53, Byte), Integer), CType(CType(97, Byte), Integer), CType(CType(202, Byte), Integer))
         Me.panelHeader.Controls.Add(Me.lblTitle)
-        Me.panelHeader.Controls.Add(Me.btnClose)
         Me.panelHeader.Dock = System.Windows.Forms.DockStyle.Top
         Me.panelHeader.Location = New System.Drawing.Point(0, 0)
         Me.panelHeader.Name = "panelHeader"
@@ -58,19 +56,6 @@ Partial Class AlarmNotification
         Me.lblTitle.Size = New System.Drawing.Size(139, 21)
         Me.lblTitle.TabIndex = 1
         Me.lblTitle.Text = "Reminder Alarm!"
-        '
-        'btnClose
-        '
-        Me.btnClose.FlatAppearance.BorderSize = 0
-        Me.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.btnClose.ForeColor = System.Drawing.Color.White
-        Me.btnClose.Location = New System.Drawing.Point(360, 0)
-        Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(40, 40)
-        Me.btnClose.TabIndex = 0
-        Me.btnClose.Text = "✕"
-        Me.btnClose.UseVisualStyleBackColor = True
         '
         'panelBody
         '
@@ -156,7 +141,6 @@ Partial Class AlarmNotification
 
     Friend WithEvents panelHeader As Panel
     Friend WithEvents lblTitle As Label
-    Friend WithEvents btnClose As Button
     Friend WithEvents panelBody As Panel
     Friend WithEvents lblTaskName As Label
     Friend WithEvents btnSnooze As Button

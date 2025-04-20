@@ -238,7 +238,8 @@ Partial Class Home
         '
         'pnlQuickTask
         '
-        Me.pnlQuickTask.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pnlQuickTask.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.pnlQuickTask.BackColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(67, Byte), Integer), CType(CType(76, Byte), Integer))
         Me.pnlQuickTask.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.pnlQuickTask.Controls.Add(Me.lblQuickTask)
