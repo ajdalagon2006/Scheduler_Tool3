@@ -10,14 +10,13 @@ Public Class DbConnection
     End Function
 
     Public Shared Function GetConnection() As SQLiteConnection
-        ' This is just an alias for GetSQLiteConnection for backward compatibility
+        ' This is for GetSQLiteConnection for backward compatibility
         Return GetSQLiteConnection()
     End Function
 
     Public Shared Sub UpdateDatabaseSchema()
         Try
             Using connection As SQLiteConnection = GetSQLiteConnection()
-                ' Check if has_alarm column exists in Task table
                 Dim checkAlarmCmd As New SQLiteCommand(
                     "PRAGMA table_info(Task)", connection)
 
@@ -34,7 +33,7 @@ Public Class DbConnection
                     End While
                 End Using
 
-                ' Adding columns
+                ' columns
                 If Not hasAlarmCol Then
                     Dim addAlarmCmd As New SQLiteCommand(
                         "ALTER TABLE Task ADD COLUMN has_alarm INTEGER DEFAULT 0", connection)
@@ -52,18 +51,10 @@ Public Class DbConnection
                         "ALTER TABLE Task ADD COLUMN category TEXT DEFAULT 'Other'", connection)
                     addCategoryCmd.ExecuteNonQuery()
 
-                    ' Update existing records to have a category
+                    ' category
                     Dim updateCmd As New SQLiteCommand(
                         "UPDATE Task SET category = 'Other' WHERE category IS NULL", connection)
                     updateCmd.ExecuteNonQuery()
-                End If
-
-                ' Holidays table exists
-                Dim checkHolidaysCmd As New SQLiteCommand(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name='Holidays'", connection)
-
-                If checkHolidaysCmd.ExecuteScalar() Is Nothing Then
-
                 End If
             End Using
         Catch ex As Exception
@@ -79,20 +70,11 @@ Public Class DbConnection
                     "SELECT name FROM sqlite_master WHERE type='table' AND name='Tags'", connection)
 
                 If checkTagsTableCmd.ExecuteScalar() Is Nothing Then
-                    ' Create Tags table
-                    Dim createTagsTableCmd = New SQLiteCommand(
-                        "CREATE TABLE Tags (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)",
-                        connection)
-                    createTagsTableCmd.ExecuteNonQuery()
-
-                    ' Insert default tags
                     Dim insertTagsCmd = New SQLiteCommand(
                         "INSERT INTO Tags (name) VALUES ('Personal'), ('Work'), ('Deadline'), ('Meeting'), ('Important')",
                         connection)
                     insertTagsCmd.ExecuteNonQuery()
                 End If
-
-                ' Check if TaskTags table exists
                 Dim checkTaskTagsTableCmd = New SQLiteCommand(
                     "SELECT name FROM sqlite_master WHERE type='table' AND name='TaskTags'", connection)
 

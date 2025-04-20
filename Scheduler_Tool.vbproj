@@ -206,6 +206,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AlarmNotification.resx">
+      <DependentUpon>AlarmNotification.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Task.resx">
       <DependentUpon>Task.vb</DependentUpon>
     </EmbeddedResource>

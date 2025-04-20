@@ -90,7 +90,7 @@ Partial Class Home
         Me.lbluser.AutoSize = True
         Me.lbluser.Font = New System.Drawing.Font("Microsoft YaHei", 24.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lbluser.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
-        Me.lbluser.Location = New System.Drawing.Point(410, 8)
+        Me.lbluser.Location = New System.Drawing.Point(464, 8)
         Me.lbluser.Name = "lbluser"
         Me.lbluser.Size = New System.Drawing.Size(263, 42)
         Me.lbluser.TabIndex = 2

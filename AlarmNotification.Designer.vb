@@ -23,6 +23,7 @@ Partial Class AlarmNotification
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AlarmNotification))
         Me.panelHeader = New System.Windows.Forms.Panel()
         Me.lblTitle = New System.Windows.Forms.Label()
         Me.btnClose = New System.Windows.Forms.Button()
@@ -54,7 +55,7 @@ Partial Class AlarmNotification
         Me.lblTitle.ForeColor = System.Drawing.Color.White
         Me.lblTitle.Location = New System.Drawing.Point(12, 9)
         Me.lblTitle.Name = "lblTitle"
-        Me.lblTitle.Size = New System.Drawing.Size(138, 21)
+        Me.lblTitle.Size = New System.Drawing.Size(139, 21)
         Me.lblTitle.TabIndex = 1
         Me.lblTitle.Text = "Reminder Alarm!"
         '
@@ -90,7 +91,7 @@ Partial Class AlarmNotification
         Me.lblTaskName.Font = New System.Drawing.Font("Segoe UI Semibold", 12.0!, System.Drawing.FontStyle.Bold)
         Me.lblTaskName.Location = New System.Drawing.Point(12, 10)
         Me.lblTaskName.Name = "lblTaskName"
-        Me.lblTaskName.Size = New System.Drawing.Size(86, 21)
+        Me.lblTaskName.Size = New System.Drawing.Size(87, 21)
         Me.lblTaskName.TabIndex = 1
         Me.lblTaskName.Text = "Task Name"
         '
@@ -139,6 +140,7 @@ Partial Class AlarmNotification
         Me.Controls.Add(Me.panelBody)
         Me.Controls.Add(Me.panelHeader)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "AlarmNotification"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual

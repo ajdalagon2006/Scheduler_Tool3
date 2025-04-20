@@ -329,7 +329,6 @@ Partial Class Task
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Name = "Task"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Add Event"
         Me.pnlHeader.ResumeLayout(False)
         Me.pnlMain.ResumeLayout(False)
         Me.pnlMain.PerformLayout()

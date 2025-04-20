@@ -38,7 +38,7 @@ Public Class Task
         If Not IsEdit Then
             date1.MinDate = DateTime.Now.Date
 
-            ' If the provided date is in the past, use today's date instead
+            ' If the provided date is in the past
             If IsDateInPast(SelectedDate) Then
                 date1.Value = DateTime.Now.Date
                 SelectedDate = date1.Value
@@ -208,18 +208,29 @@ Public Class Task
 
         Try
             Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
-                ' Check if task with same name already exists for this date (for new tasks or renamed tasks)
-                If Not IsEdit OrElse (todobox.Text <> OriginalNote) Then
-                    Dim checkCmd As New SQLiteCommand(
-                    "SELECT COUNT(*) FROM Task WHERE todoname = @name AND Date = @date", connection)
-                    checkCmd.Parameters.AddWithValue("@name", todobox.Text)
-                    checkCmd.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
+                ' Try to find existing task with same name on same date
+                Dim taskName As String = todobox.Text.Trim()
+                Dim checkCmd As New SQLiteCommand(
+                "SELECT COUNT(*) FROM Task WHERE todoname = @name AND Date = @date", connection)
+                checkCmd.Parameters.AddWithValue("@name", taskName)
+                checkCmd.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
 
-                    Dim count As Integer = Convert.ToInt32(checkCmd.ExecuteScalar())
-                    If count > 0 Then
-                        MessageBox.Show("A task with this name already exists for this date. Please use a different name or date.",
-                               "Duplicate Task", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                        Return
+                ' If a task with this name exists (and we're not editing it), make the name unique
+                Dim count As Integer = Convert.ToInt32(checkCmd.ExecuteScalar())
+                If count > 0 AndAlso (Not IsEdit OrElse taskName <> OriginalNote) Then
+                    ' Get the current time for the task
+                    Dim timeStr As String = ""
+                    If cmbStartTime.SelectedItem IsNot Nothing Then
+                        timeStr = cmbStartTime.SelectedItem.ToString()
+                    ElseIf chkAlarm.Checked Then
+                        timeStr = timePicker.Value.ToString("h:mm tt")
+                    End If
+
+                    ' Append time or a random number to make name unique
+                    If Not String.IsNullOrEmpty(timeStr) Then
+                        taskName = taskName & " (" & timeStr & ")"
+                    Else
+                        taskName = taskName & " (" & DateTime.Now.ToString("h:mm:ss") & ")"
                     End If
                 End If
 
@@ -252,7 +263,7 @@ Public Class Task
                     commentText = ""
                 End If
 
-                command.Parameters.AddWithValue("@todoname", todobox.Text)
+                command.Parameters.AddWithValue("@todoname", taskName) ' Use potentially modified taskName
                 command.Parameters.AddWithValue("@comment", commentText)
                 command.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
                 command.Parameters.AddWithValue("@category", If(e1.Checked, "Event", "School Works"))
@@ -278,7 +289,7 @@ Public Class Task
                 command.ExecuteNonQuery()
 
                 DataSaved = True
-                NewNote = todobox.Text
+                NewNote = taskName ' Return the (potentially modified) task name
             End Using
         Catch ex As Exception
             MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)

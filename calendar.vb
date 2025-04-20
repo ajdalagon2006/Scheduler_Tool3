@@ -97,8 +97,6 @@ Public Class calendar
 
     Private Sub SizeContainers()
         ' size 
-        Me.Width = 1000
-
         Dim daysHeight As Integer
         Dim daysYStart As Integer
 

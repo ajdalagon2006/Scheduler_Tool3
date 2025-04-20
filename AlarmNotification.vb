@@ -2,7 +2,7 @@
 Imports System.Data.SQLite
 
 Public Class AlarmNotification
-    ' Optional: API for rounded corners
+    ' API for rounded corners
     <DllImport("Gdi32.dll", EntryPoint:="CreateRoundRectRgn")>
     Private Shared Function CreateRoundRectRgn(
                                 ByVal x1 As Integer,
@@ -26,11 +26,11 @@ Public Class AlarmNotification
         Dim screenHeight As Integer = Screen.PrimaryScreen.WorkingArea.Height
         Me.Location = New Point(screenWidth - Me.Width - 20, screenHeight - Me.Height - 20)
 
-        ' Optional: Make form have rounded corners
+        ' Make form have rounded corners
         Try
             Me.Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 20, 20))
         Catch ex As Exception
-            ' Silently fail if rounded corners aren't supported
+
         End Try
 
         ' Start fade-in
@@ -64,7 +64,7 @@ Public Class AlarmNotification
             calendarForm.StopAlarmSound()
         End If
 
-        ' Close the notification
+
         Me.Close()
     End Sub
 

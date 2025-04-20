@@ -23,6 +23,7 @@ Partial Class calendar
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(calendar))
         Me.DaysRow5Container = New System.Windows.Forms.Panel()
         Me.DaysRow4Container = New System.Windows.Forms.Panel()
         Me.DaysRow3Container = New System.Windows.Forms.Panel()
@@ -56,6 +57,8 @@ Partial Class calendar
         '
         'DaysRow5Container
         '
+        Me.DaysRow5Container.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysRow5Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(95, Byte), Integer), CType(CType(96, Byte), Integer), CType(CType(117, Byte), Integer))
         Me.DaysRow5Container.Location = New System.Drawing.Point(22, 391)
         Me.DaysRow5Container.Name = "DaysRow5Container"
@@ -64,6 +67,8 @@ Partial Class calendar
         '
         'DaysRow4Container
         '
+        Me.DaysRow4Container.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysRow4Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(90, Byte), Integer), CType(CType(91, Byte), Integer), CType(CType(111, Byte), Integer))
         Me.DaysRow4Container.Location = New System.Drawing.Point(22, 334)
         Me.DaysRow4Container.Name = "DaysRow4Container"
@@ -72,6 +77,8 @@ Partial Class calendar
         '
         'DaysRow3Container
         '
+        Me.DaysRow3Container.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysRow3Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(85, Byte), Integer), CType(CType(86, Byte), Integer), CType(CType(105, Byte), Integer))
         Me.DaysRow3Container.Location = New System.Drawing.Point(21, 277)
         Me.DaysRow3Container.Name = "DaysRow3Container"
@@ -80,6 +87,8 @@ Partial Class calendar
         '
         'DaysRow2Container
         '
+        Me.DaysRow2Container.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysRow2Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(80, Byte), Integer), CType(CType(81, Byte), Integer), CType(CType(99, Byte), Integer))
         Me.DaysRow2Container.Location = New System.Drawing.Point(21, 220)
         Me.DaysRow2Container.Name = "DaysRow2Container"
@@ -88,6 +97,8 @@ Partial Class calendar
         '
         'DaysRow1Container
         '
+        Me.DaysRow1Container.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysRow1Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(75, Byte), Integer), CType(CType(76, Byte), Integer), CType(CType(93, Byte), Integer))
         Me.DaysRow1Container.Location = New System.Drawing.Point(21, 163)
         Me.DaysRow1Container.Name = "DaysRow1Container"
@@ -96,6 +107,8 @@ Partial Class calendar
         '
         'DaysRow0Container
         '
+        Me.DaysRow0Container.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysRow0Container.BackColor = System.Drawing.Color.FromArgb(CType(CType(70, Byte), Integer), CType(CType(71, Byte), Integer), CType(CType(87, Byte), Integer))
         Me.DaysRow0Container.Location = New System.Drawing.Point(22, 106)
         Me.DaysRow0Container.Name = "DaysRow0Container"
@@ -104,6 +117,8 @@ Partial Class calendar
         '
         'DaysOfWeekContainer
         '
+        Me.DaysOfWeekContainer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DaysOfWeekContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(60, Byte), Integer), CType(CType(61, Byte), Integer), CType(CType(74, Byte), Integer))
         Me.DaysOfWeekContainer.Location = New System.Drawing.Point(22, 66)
         Me.DaysOfWeekContainer.Name = "DaysOfWeekContainer"
@@ -112,6 +127,8 @@ Partial Class calendar
         '
         'MonthYearContainer
         '
+        Me.MonthYearContainer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.MonthYearContainer.BackColor = System.Drawing.Color.FromArgb(CType(CType(50, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(61, Byte), Integer))
         Me.MonthYearContainer.Controls.Add(Me.lblCurrentMonth)
         Me.MonthYearContainer.Controls.Add(Me.btnNextMonth)
@@ -123,6 +140,7 @@ Partial Class calendar
         '
         'lblCurrentMonth
         '
+        Me.lblCurrentMonth.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblCurrentMonth.AutoSize = True
         Me.lblCurrentMonth.Font = New System.Drawing.Font("Segoe UI", 18.0!, System.Drawing.FontStyle.Bold)
         Me.lblCurrentMonth.ForeColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(209, Byte), Integer), CType(CType(236, Byte), Integer))
@@ -135,6 +153,7 @@ Partial Class calendar
         '
         'btnNextMonth
         '
+        Me.btnNextMonth.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnNextMonth.FlatAppearance.BorderSize = 0
         Me.btnNextMonth.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNextMonth.Font = New System.Drawing.Font("Segoe UI", 14.25!, System.Drawing.FontStyle.Bold)
@@ -179,11 +198,14 @@ Partial Class calendar
         '
         'TasksPanel
         '
+        Me.TasksPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TasksPanel.AutoScroll = True
         Me.TasksPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(50, Byte), Integer), CType(CType(51, Byte), Integer), CType(CType(61, Byte), Integer))
         Me.TasksPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TasksPanel.Location = New System.Drawing.Point(250, 75)
+        Me.TasksPanel.Location = New System.Drawing.Point(215, 75)
         Me.TasksPanel.Name = "TasksPanel"
-        Me.TasksPanel.Size = New System.Drawing.Size(300, 300)
+        Me.TasksPanel.Size = New System.Drawing.Size(392, 300)
         Me.TasksPanel.TabIndex = 15
         Me.TasksPanel.Visible = False
         '
@@ -301,9 +323,9 @@ Partial Class calendar
         Me.Controls.Add(Me.DaysRow0Container)
         Me.Controls.Add(Me.DaysOfWeekContainer)
         Me.Controls.Add(Me.MonthYearContainer)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "calendar"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Calendar Scheduler"
         Me.MonthYearContainer.ResumeLayout(False)
         Me.MonthYearContainer.PerformLayout()
         Me.ContextMenuStrip1.ResumeLayout(False)

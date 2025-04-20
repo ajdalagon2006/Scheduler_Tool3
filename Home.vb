@@ -5,6 +5,7 @@ Imports System.Data.SQLite
 Public Class Home
     Private userId As Integer
 
+#Region "UI Design"
     ' Constructor accepting user ID
     Public Sub New(userId As Integer)
         ' This call is required by the designer.
@@ -112,6 +113,9 @@ Public Class Home
             currentBtn.TextImageRelation = TextImageRelation.ImageBeforeText
         End If
     End Sub
+#End Region
+
+#Region "Database Connection"
     Private username As String
 
     ' Date/Time updates
@@ -270,7 +274,7 @@ Public Class Home
                             If timeSpan.TotalMinutes > 0 AndAlso timeSpan.TotalHours < 24 Then
                                 lblCountdown.Text = $"In {timeSpan.Hours}h {timeSpan.Minutes}m"
 
-                                ' Progress calculation (assuming 24h max view)
+                                ' Progress calculation 
                                 Dim progressPercentage As Integer = Math.Max(0, 100 - CInt((timeSpan.TotalHours / 24) * 100))
                                 prgTaskProgress.Value = progressPercentage
                             Else
@@ -318,17 +322,12 @@ Public Class Home
                 Dim totalTasks As Integer = Convert.ToInt32(countCmd.ExecuteScalar())
 
                 ' Count completed tasks
-                ' Note: You'll need to add a "completed" column to your Task table
-                ' and modify this query accordingly
                 Dim completedCmd As New SQLiteCommand(
                 "SELECT COUNT(*) FROM Task 
                  WHERE Date BETWEEN @start AND @end AND completed = 1",
                 connection)
                 completedCmd.Parameters.AddWithValue("@start", startOfWeek.ToString("yyyy-MM-dd"))
                 completedCmd.Parameters.AddWithValue("@end", endOfWeek.ToString("yyyy-MM-dd"))
-
-                ' If you don't have a completed column yet, comment this out:
-                'Dim completedTasks As Integer = Convert.ToInt32(completedCmd.ExecuteScalar())
 
                 ' For demonstration, using a hardcoded value:
                 Dim completedTasks As Integer = 8
@@ -398,7 +397,9 @@ Public Class Home
             MessageBox.Show("Error adding task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+#End Region
 
+#Region "Placeholder Text"
     ' Event handlers for placeholder text
     Private Sub txtTaskTitle_Enter(sender As Object, e As EventArgs) Handles txtTaskTitle.Enter
         If txtTaskTitle.Text = "Enter task title here..." Then
@@ -533,7 +534,7 @@ Public Class Home
         OpenChildForm(New calendar)
         lblFormTitle.Text = "Calendar View"
     End Sub
-
+#End Region
 
 
 End Class
