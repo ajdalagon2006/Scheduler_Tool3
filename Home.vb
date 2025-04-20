@@ -461,8 +461,6 @@ Public Class Home
 
     ' Home page initialization
     Private Sub Home_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' Your existing code here...
-
         ' Initialize components
         lblDateTime.Text = DateTime.Now.ToString("dddd, MMMM d, yyyy | HH:mm")
 
