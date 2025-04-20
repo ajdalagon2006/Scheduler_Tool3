@@ -471,6 +471,7 @@ Public Class Home
         quotes.Add(New Tuple(Of String, String)("The bad news is time flies. The good news is you're the pilot.", "Michael Altshuler"))
         quotes.Add(New Tuple(Of String, String)("A goal without a plan is just a wish.", "Antoine de Saint-Exupéry"))
         quotes.Add(New Tuple(Of String, String)("You'll never find time for anything. If you want time, you must make it.", "Charles Buxton"))
+        quotes.Add(New Tuple(Of String, String)("We cannot solve problems with the kind of thinking we employed when we came up with them.", "Albert Einstein"))
 
         ' Select random quote
         Dim random As New Random()
@@ -494,16 +495,15 @@ Public Class Home
 
     ' Calendar view button
     Private Sub btnViewAllTasks_Click(sender As Object, e As EventArgs) Handles btnViewAllTasks.Click
-        ' Same as clicking the Calendar View button
         viewbtn_Click(viewbtn, EventArgs.Empty)
     End Sub
 
-    ' Quick task add button (replacing original Button1 functionality)
+    ' Quick task add button
     Private Sub Button1_Click(sender As Object, e As EventArgs)
         Dim addEditForm As New Task(DateTime.Now)
         addEditForm.ShowDialog()
 
-        ' Refresh when the task form closes (if data was saved)
+        ' Refresh when the task form closes 
         If addEditForm.DataSaved Then
             LoadTodaysTasks()
             LoadUpcomingTask()

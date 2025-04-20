@@ -111,7 +111,6 @@ Public Class Task
 
     ' Updated alarm checkbox handler:
     Private Sub chkAlarm_CheckedChanged(sender As Object, e As EventArgs) Handles chkAlarm.CheckedChanged
-        ' Enable/disable alarm settings panel based on checkbox
         pnlAlarmSettings.Enabled = chkAlarm.Checked
     End Sub
 
@@ -289,7 +288,7 @@ Public Class Task
                 command.ExecuteNonQuery()
 
                 DataSaved = True
-                NewNote = taskName ' Return the (potentially modified) task name
+                NewNote = taskName ' Return the task name
             End Using
         Catch ex As Exception
             MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -298,7 +297,7 @@ Public Class Task
     End Sub
 
     Private Function IsDateInPast(dateToCheck As DateTime) As Boolean
-        ' Compare only the date parts (ignoring time)
+        ' Compare only the date parts 
         Return dateToCheck.Date < DateTime.Now.Date
     End Function
 
