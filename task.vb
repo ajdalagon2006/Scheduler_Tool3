@@ -7,6 +7,7 @@ Public Class Task
     Private IsEdit As Boolean
     Private SelectedDate As DateTime
     Private OriginalNote As String
+    Private isSubmitting As Boolean = False
     Private openSoundDialog As New OpenFileDialog()
 
     Public Sub New(d As DateTime)
@@ -193,108 +194,150 @@ Public Class Task
     End Sub
 
     Private Sub SaveTask()
+    ' Prevent multiple submissions
+    If isSubmitting Then
+        Return
+    End If
+    isSubmitting = True
+
+    Try
         ' Check for empty title
         If String.IsNullOrWhiteSpace(todobox.Text) OrElse todobox.Text = "Add a title" Then
             MessageBox.Show("Task name cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            isSubmitting = False
             Return
         End If
 
         ' Only check the date if this is a new task (not editing an existing one)
         If Not IsEdit AndAlso IsDateInPast(date1.Value) Then
             MessageBox.Show("Cannot create tasks for past dates.", "Invalid Date", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            isSubmitting = False
             Return
         End If
 
-        Try
-            Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
-                ' Try to find existing task with same name on same date
-                Dim taskName As String = todobox.Text.Trim()
-                Dim checkCmd As New SQLiteCommand(
-                "SELECT COUNT(*) FROM Task WHERE todoname = @name AND Date = @date", connection)
-                checkCmd.Parameters.AddWithValue("@name", taskName)
-                checkCmd.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
+        ' Get alarm time if specified
+        Dim alarmTimeValue As DateTime? = Nothing
+        If chkAlarm.Checked Then
+            alarmTimeValue = New DateTime(
+            date1.Value.Year,
+            date1.Value.Month,
+            date1.Value.Day,
+            timePicker.Value.Hour,
+            timePicker.Value.Minute,
+            0)
+        End If
 
-                ' If a task with this name exists (and we're not editing it), make the name unique
-                Dim count As Integer = Convert.ToInt32(checkCmd.ExecuteScalar())
-                If count > 0 AndAlso (Not IsEdit OrElse taskName <> OriginalNote) Then
-                    ' Get the current time for the task
-                    Dim timeStr As String = ""
-                    If cmbStartTime.SelectedItem IsNot Nothing Then
-                        timeStr = cmbStartTime.SelectedItem.ToString()
-                    ElseIf chkAlarm.Checked Then
-                        timeStr = timePicker.Value.ToString("h:mm tt")
-                    End If
+        Using connection As SQLiteConnection = DbConnection.GetSQLiteConnection()
+            ' Check for duplicate alarm time on the same date
+            If alarmTimeValue.HasValue Then
+                Dim checkAlarmCmd As New SQLiteCommand(
+                "SELECT COUNT(*) FROM Task WHERE Date = @date AND has_alarm = 1 AND " &
+                "strftime('%H:%M', alarm_time) = @alarmTime" &
+                (If(IsEdit, " AND todoname <> @originalName", "")), connection)
 
-                    ' Append time or a random number to make name unique
-                    If Not String.IsNullOrEmpty(timeStr) Then
-                        taskName = taskName & " (" & timeStr & ")"
-                    Else
-                        taskName = taskName & " (" & DateTime.Now.ToString("h:mm:ss") & ")"
-                    End If
-                End If
-
-                ' Continue with existing save logic
-                Dim command As SQLiteCommand
+                checkAlarmCmd.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
+                checkAlarmCmd.Parameters.AddWithValue("@alarmTime", alarmTimeValue.Value.ToString("HH:mm"))
 
                 If IsEdit Then
-                    command = New SQLiteCommand(
-                "UPDATE Task SET 
-                todoname = @todoname, 
-                Comment = @comment, 
-                category = @category,
-                has_alarm = @hasAlarm,
-                alarm_time = @alarmTime,
-                alarm_sound = @alarmSound
-                WHERE todoname = @originalName AND Date = @date", connection)
+                    checkAlarmCmd.Parameters.AddWithValue("@originalName", OriginalNote)
+                End If
 
-                    command.Parameters.AddWithValue("@originalName", OriginalNote)
+                Dim alarmCount As Integer = Convert.ToInt32(checkAlarmCmd.ExecuteScalar())
+                If alarmCount > 0 Then
+                    MessageBox.Show("A task with this alarm time already exists. Please choose a different time.",
+                             "Duplicate Alarm Time", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    isSubmitting = False
+                    Return
+                End If
+            End If
+
+            ' Try to find existing task with same name on same date
+            Dim taskName As String = todobox.Text.Trim()
+            Dim checkCmd As New SQLiteCommand(
+            "SELECT COUNT(*) FROM Task WHERE todoname = @name AND Date = @date" &
+            (If(IsEdit, " AND todoname <> @originalName", "")), connection)
+
+            checkCmd.Parameters.AddWithValue("@name", taskName)
+            checkCmd.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
+
+            If IsEdit Then
+                checkCmd.Parameters.AddWithValue("@originalName", OriginalNote)
+            End If
+
+            ' If a task with this name exists, make the name unique
+            Dim count As Integer = Convert.ToInt32(checkCmd.ExecuteScalar())
+            If count > 0 Then
+                ' Get the current time for the task
+                Dim timeStr As String = ""
+                If cmbStartTime.SelectedItem IsNot Nothing Then
+                    timeStr = cmbStartTime.SelectedItem.ToString()
+                ElseIf chkAlarm.Checked Then
+                    timeStr = timePicker.Value.ToString("h:mm tt")
+                End If
+
+                ' Append time or a random number to make name unique
+                If Not String.IsNullOrEmpty(timeStr) Then
+                    taskName = taskName & " (" & timeStr & ")"
                 Else
-                    command = New SQLiteCommand(
-                "INSERT INTO Task 
-                (todoname, Comment, Date, category, has_alarm, alarm_time, alarm_sound) 
-                VALUES 
-                (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
+                    taskName = taskName & " (" & DateTime.Now.ToString("h:mm:ss") & ")"
                 End If
+            End If
 
-                ' Clean up comment text if it's the default placeholder
-                Dim commentText As String = comsecbox.Text
-                If commentText = "Add a description or attach documents" Then
-                    commentText = ""
-                End If
+            ' Continue with existing save logic
+            Dim command As SQLiteCommand
 
-                command.Parameters.AddWithValue("@todoname", taskName) ' Use potentially modified taskName
-                command.Parameters.AddWithValue("@comment", commentText)
-                command.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
-                command.Parameters.AddWithValue("@category", If(e1.Checked, "Event", "School Works"))
-                command.Parameters.AddWithValue("@hasAlarm", chkAlarm.Checked)
+            If IsEdit Then
+                command = New SQLiteCommand(
+            "UPDATE Task SET 
+            todoname = @todoname, 
+            Comment = @comment, 
+            category = @category,
+            has_alarm = @hasAlarm,
+            alarm_time = @alarmTime,
+            alarm_sound = @alarmSound
+            WHERE todoname = @originalName AND Date = @date", connection)
 
-                If chkAlarm.Checked Then
-                    ' Combine the selected date with the time from timePicker
-                    Dim alarmTime As New DateTime(
-                date1.Value.Year,
-                date1.Value.Month,
-                date1.Value.Day,
-                timePicker.Value.Hour,
-                timePicker.Value.Minute,
-                0)
+                command.Parameters.AddWithValue("@originalName", OriginalNote)
+            Else
+                command = New SQLiteCommand(
+            "INSERT INTO Task 
+            (todoname, Comment, Date, category, has_alarm, alarm_time, alarm_sound) 
+            VALUES 
+            (@todoname, @comment, @date, @category, @hasAlarm, @alarmTime, @alarmSound)", connection)
+            End If
 
-                    command.Parameters.AddWithValue("@alarmTime", alarmTime.ToString("yyyy-MM-dd HH:mm:ss"))
-                    command.Parameters.AddWithValue("@alarmSound", txtSoundFile.Text)
-                Else
-                    command.Parameters.AddWithValue("@alarmTime", DBNull.Value)
-                    command.Parameters.AddWithValue("@alarmSound", "default.wav")
-                End If
+            ' Clean up comment text if it's the default placeholder
+            Dim commentText As String = comsecbox.Text
+            If commentText = "Add a description or attach documents" Then
+                commentText = ""
+            End If
 
-                command.ExecuteNonQuery()
+            command.Parameters.AddWithValue("@todoname", taskName)
+            command.Parameters.AddWithValue("@comment", commentText)
+            command.Parameters.AddWithValue("@date", date1.Value.ToString("yyyy-MM-dd"))
+            command.Parameters.AddWithValue("@category", If(e1.Checked, "Event", "School Works"))
+            command.Parameters.AddWithValue("@hasAlarm", chkAlarm.Checked)
 
-                DataSaved = True
-                NewNote = taskName ' Return the task name
-            End Using
-        Catch ex As Exception
-            MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            DataSaved = False
-        End Try
-    End Sub
+            If chkAlarm.Checked Then
+                command.Parameters.AddWithValue("@alarmTime", alarmTimeValue.Value.ToString("yyyy-MM-dd HH:mm:ss"))
+                command.Parameters.AddWithValue("@alarmSound", txtSoundFile.Text)
+            Else
+                command.Parameters.AddWithValue("@alarmTime", DBNull.Value)
+                command.Parameters.AddWithValue("@alarmSound", "default.wav")
+            End If
+
+            command.ExecuteNonQuery()
+
+            DataSaved = True
+            NewNote = taskName
+        End Using
+    Catch ex As Exception
+        MessageBox.Show("Error saving task: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        DataSaved = False
+    Finally
+        isSubmitting = False
+    End Try
+End Sub
 
     Private Function IsDateInPast(dateToCheck As DateTime) As Boolean
         ' Compare only the date parts 
